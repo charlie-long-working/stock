@@ -87,7 +87,9 @@ Cron: `5 1-7 * * 1-5`
 
 ## Lưu ý
 
-- Actions **không giữ** disk giữa các run → dùng `actions/cache` cho `ohlcv/` (đã cấu hình).
-- `vnstock` gọi API ngoài; nếu rate-limit, tăng `--delay` hoặc giảm `--symbols`.
-- Không commit `.env` lên GitHub — chỉ dùng Secrets.
+- Sau mỗi run, Actions **commit + push** `vn_stock/data/ohlcv/` (+ snapshot/dedupe) vào chính repo → lần sau chỉ fetch incremental (CSV trên Git = “DB file”).
+- Tắt khi Run workflow: `commit_data=false`.
+- Repo sẽ lớn dần; public repo thì ai cũng xem được CSV.
+- `vnstock` rate-limit: tăng `--delay` hoặc giảm `--symbols`.
+- Không commit `.env` — chỉ dùng Secrets.
 - Artifact `hourly-vn-snapshot` giữ 14 ngày để tải JSON về xem.
