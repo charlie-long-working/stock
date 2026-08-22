@@ -11,14 +11,11 @@ build/
 .venv/
 venv/
 
-# Local market data & run artifacts (Actions uses cache instead)
-vn_stock/data/ohlcv/
+# Keep OHLCV + latest snapshot in git (Actions commits updates).
+# Ignore only noisy local run logs / dated snapshots:
 vn_stock/data/screening/logs/
-vn_stock/data/screening/hourly_vn_sent.json
-vn_stock/data/screening/telegram_sent_cache.json
-vn_stock/data/screening/hourly_vn_*.json
-# Keep small reports if present; ignore bulky CSV dumps optionally:
-# vn_stock/data/
+vn_stock/data/screening/hourly_vn_[0-9]*.json
+
 
 # IDE
 .idea/

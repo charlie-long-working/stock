@@ -1,14 +1,13 @@
 # VN Hourly: cập nhật nến + tín hiệu → Telegram
 # Lịch ICT T2–T6 8:05–14:05 = UTC 1:05–7:05 Mon–Fri
 #
-# Secrets (Settings → Secrets → Actions):
-#   TELEGRAM_BOT_TOKEN
-#   TELEGRAM_CHAT_ID
-#   TB_CHECKOUT_TOKEN  — PAT (repo read) nếu Trading-bot là private
-#                        (cùng org + GITHUB_TOKEN đôi khi đủ; private thì nên dùng PAT)
+# Sau mỗi lần chạy: commit CSV OHLCV (+ snapshot/dedupe) vào chính repo này
+# → lần sau checkout đã có data, chỉ fetch incremental.
 #
-# Repo Trading-bot mặc định: charlie-long-working/trading-bot
-# Đổi bằng biến repo Variable TB_REPO nếu cần.
+# Secrets:
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+#   TB_CHECKOUT_TOKEN — PAT đọc Trading-bot nếu private
+# Variables: TB_REPO (default charlie-long-working/trading-bot)
 
 name: VN Hourly Telegram
 
@@ -33,10 +32,17 @@ on:
         description: "Danh sách mã (trống = VN30/default)"
         required: false
         default: ""
+      commit_data:
+        description: "Commit CSV OHLCV vào repo"
+        required: false
+        default: "true"
 
 concurrency:
   group: vn-hourly
   cancel-in-progress: false
+
+permissions:
+  contents: write
 
 jobs:
   hourly:
@@ -47,6 +53,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: stock
+          # cần history nhẹ + token mặc định để push commit data
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Trading-bot (botdown engines)
         uses: actions/checkout@v4
@@ -63,27 +72,7 @@ jobs:
           cache-dependency-path: stock/requirements.txt
 
       - name: Install dependencies
-        run: |
-          pip install --quiet -r stock/requirements.txt
-          # botdown chỉ cần numpy/pandas (đã có); không sửa code Trading-bot
-
-      - name: Restore OHLCV cache
-        uses: actions/cache@v4
-        with:
-          path: stock/vn_stock/data/ohlcv
-          key: vn-ohlcv-${{ github.run_id }}
-          restore-keys: |
-            vn-ohlcv-
-
-      - name: Restore signal dedupe cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            stock/vn_stock/data/screening/hourly_vn_sent.json
-            stock/vn_stock/data/screening/telegram_sent_cache.json
-          key: vn-hourly-sent-${{ github.run_id }}
-          restore-keys: |
-            vn-hourly-sent-
+        run: pip install --quiet -r stock/requirements.txt
 
       - name: Run hourly VN session
         env:
@@ -98,7 +87,6 @@ jobs:
           DRY="${{ github.event.inputs.dry_run || 'false' }}"
           HB="${{ github.event.inputs.heartbeat || 'false' }}"
           SYMS="${{ github.event.inputs.symbols || '' }}"
-          # schedule luôn trong cửa sổ UTC 1–7; workflow_dispatch có thể --force
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$FORCE" = "true" ]; then
             EXTRA="$EXTRA --force"
           fi
@@ -108,13 +96,29 @@ jobs:
           echo "Run EXTRA=$EXTRA TZ=$TZ"
           python -m vn_stock.scripts.run_hourly_vn_session --delay 3.5 $EXTRA
 
+      - name: Commit OHLCV CSV + snapshot into repo
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.commit_data != 'false' }}
+        working-directory: stock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vn_stock/data/ohlcv \
+                  vn_stock/data/screening/hourly_vn_snapshot.json \
+                  vn_stock/data/screening/hourly_vn_sent.json \
+                  vn_stock/data/screening/telegram_sent_cache.json || true
+          if git diff --staged --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore(data): hourly OHLCV update [skip ci]"
+            git push
+            echo "Committed and pushed OHLCV CSV."
+          fi
+
       - name: Upload snapshot artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: hourly-vn-snapshot
-          path: |
-            stock/vn_stock/data/screening/hourly_vn_snapshot.json
-            stock/vn_stock/data/screening/hourly_vn_*.json
+          path: stock/vn_stock/data/screening/hourly_vn_snapshot.json
           if-no-files-found: ignore
           retention-days: 14
