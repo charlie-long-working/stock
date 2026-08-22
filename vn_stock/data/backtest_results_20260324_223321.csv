@@ -1,0 +1,4 @@
+symbol,strategy,interval,num_trades,total_return_pct,hold_return_pct,win_rate,profit_factor,sharpe_ratio,max_drawdown_pct,avg_win_pct,avg_loss_pct
+CEO,div_macd_rsi,1D,8,208.03,166.20,50.0,7.89,5.19,58.3,162.73,-20.63
+VIC,div_macd_rsi,1D,6,-16.51,1503.33,33.3,1.07,0.48,58.3,41.45,-19.40
+DIG,div_macd_rsi,1D,11,-70.52,219.38,45.5,0.90,-0.72,78.2,33.13,-30.81

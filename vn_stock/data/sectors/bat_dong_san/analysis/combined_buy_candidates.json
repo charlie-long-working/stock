@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-03-22T21:12:30.813401",
+  "candidates": [
+    {
+      "symbol": "DLG",
+      "interval": "1D",
+      "combined_score": 0.633,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.5825,
+      "entry_price": 2.64,
+      "stop_loss": 2.457135796017237,
+      "take_profit": 2.944773673304605,
+      "best_strategy": "macd_rsi",
+      "technical": [
+        "macd_rsi:macd_cross_up (RSI=42.6)",
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "ROE cao (>20%)",
+        "D/E=3.2",
+        "FCF duong",
+        "P/E thap (2.2)",
+        "P/B < 1 (0.82)",
+        "EPS: 818 VND"
+      ]
+    },
+    {
+      "symbol": "VHM",
+      "interval": "1D",
+      "combined_score": 0.4730000000000001,
+      "fundamental_trend": "up",
+      "fundamental_score": 0.6825000000000001,
+      "entry_price": 100.0,
+      "stop_loss": 95.1,
+      "take_profit": 103.0,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "D/E=2.2",
+        "FCF duong",
+        "P/E thap (10.0)",
+        "EPS: 6,507 VND"
+      ]
+    },
+    {
+      "symbol": "LCG",
+      "interval": "1D",
+      "combined_score": 0.45300000000000007,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.6325000000000001,
+      "entry_price": 9.73,
+      "stop_loss": 9.12,
+      "take_profit": 10.0219,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:demand_zone"
+      ],
+      "flags": [
+        "FCF duong",
+        "P/B < 1 (0.74)",
+        "EPS: 292 VND"
+      ]
+    },
+    {
+      "symbol": "PDR",
+      "interval": "1D",
+      "combined_score": 0.45199999999999996,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.63,
+      "entry_price": 15.15,
+      "stop_loss": 13.7,
+      "take_profit": 15.604500000000002,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:demand_zone"
+      ],
+      "flags": [
+        "ROE thap (<5%)",
+        "EPS: 314 VND"
+      ]
+    },
+    {
+      "symbol": "HQC",
+      "interval": "1D",
+      "combined_score": 0.43200000000000005,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.5800000000000001,
+      "entry_price": 2.61,
+      "stop_loss": 2.55,
+      "take_profit": 2.6883,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "ROE thap (<5%)",
+        "P/B < 1 (0.28)",
+        "EPS: 96 VND"
+      ]
+    },
+    {
+      "symbol": "CKG",
+      "interval": "1D",
+      "combined_score": 0.42699999999999994,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.5674999999999999,
+      "entry_price": 9.19,
+      "stop_loss": 9.16,
+      "take_profit": 9.4657,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "Loi nhuan giam manh (>20%)",
+        "FCF duong",
+        "P/B < 1 (0.74)",
+        "EPS: 216 VND"
+      ]
+    },
+    {
+      "symbol": "L14",
+      "interval": "1D",
+      "combined_score": 0.42400000000000004,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.56,
+      "entry_price": 23.0,
+      "stop_loss": 21.3,
+      "take_profit": 23.69,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "FCF duong",
+        "P/E cao (32.1)",
+        "EPS: 36 VND"
+      ]
+    },
+    {
+      "symbol": "NLG",
+      "interval": "1D",
+      "combined_score": 0.41600000000000004,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.54,
+      "entry_price": 27.7,
+      "stop_loss": 27.05,
+      "take_profit": 28.531,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "Loi nhuan giam manh (>20%)",
+        "EPS: 717 VND"
+      ]
+    },
+    {
+      "symbol": "TCH",
+      "interval": "1D",
+      "combined_score": 0.398,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.495,
+      "entry_price": 14.9,
+      "stop_loss": 14.7,
+      "take_profit": 15.347000000000001,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_ob"
+      ],
+      "flags": [
+        "ROE thap (<5%)",
+        "Loi nhuan giam manh (>20%)",
+        "CF kinh doanh am",
+        "P/E cao (35.8)",
+        "EPS: 57 VND"
+      ]
+    },
+    {
+      "symbol": "VIC",
+      "interval": "1D",
+      "combined_score": 0.364,
+      "fundamental_trend": "stable",
+      "fundamental_score": 0.41000000000000003,
+      "entry_price": 135.0,
+      "stop_loss": 133.3,
+      "take_profit": 139.05,
+      "best_strategy": "regime_fusion",
+      "technical": [
+        "regime_fusion:bull_fvg"
+      ],
+      "flags": [
+        "D/E=6.4 (cao, binh thuong neu ngan hang)",
+        "FCF duong",
+        "P/E cao (77.6)",
+        "P/B cao (7.00)",
+        "EPS: 878 VND"
+      ]
+    }
+  ]
+}

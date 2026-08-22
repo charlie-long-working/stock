@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-08-23T01:30:59.726625",
+  "note": "Imported botdown engines only; Trading-bot code untouched. Long-only VN 1D.",
+  "params": "TP 10% / SL 4% / fee 0.1% round-trip (crypto defaults)",
+  "deposit_benchmark_pct": 4.75,
+  "symbols": [
+    "VCB",
+    "BID",
+    "TCB",
+    "FPT",
+    "HPG",
+    "MWG",
+    "MSN",
+    "GAS",
+    "VHM",
+    "VNM"
+  ],
+  "summary": {
+    "macd_rsi_pct": {
+      "n": 10,
+      "avg_cagr_pct": 5.96,
+      "avg_ann_simple_pct": 9.2,
+      "avg_total_return_pct": 95.83,
+      "avg_win_rate": 38.5,
+      "avg_max_dd_pct": 33.2,
+      "avg_trades": 67.0,
+      "pct_beat_deposit": 60.0,
+      "pos_rate_pct": 90.0,
+      "vs_deposit_4_75": "beats"
+    },
+    "macd_rsi_pct_ema": {
+      "n": 10,
+      "avg_cagr_pct": 4.06,
+      "avg_ann_simple_pct": 6.47,
+      "avg_total_return_pct": 80.12,
+      "avg_win_rate": 41.9,
+      "avg_max_dd_pct": 17.5,
+      "avg_trades": 28.2,
+      "pct_beat_deposit": 40.0,
+      "pos_rate_pct": 70.0,
+      "vs_deposit_4_75": "loses"
+    },
+    "smc_pct": {
+      "n": 10,
+      "avg_cagr_pct": 6.39,
+      "avg_ann_simple_pct": 16.14,
+      "avg_total_return_pct": 208.66,
+      "avg_win_rate": 35.7,
+      "avg_max_dd_pct": 41.7,
+      "avg_trades": 103.1,
+      "pct_beat_deposit": 60.0,
+      "pos_rate_pct": 80.0,
+      "vs_deposit_4_75": "beats"
+    },
+    "smc_pct_ema": {
+      "n": 10,
+      "avg_cagr_pct": 5.59,
+      "avg_ann_simple_pct": 11.4,
+      "avg_total_return_pct": 150.35,
+      "avg_win_rate": 37.8,
+      "avg_max_dd_pct": 29.4,
+      "avg_trades": 60.0,
+      "pct_beat_deposit": 60.0,
+      "pos_rate_pct": 80.0,
+      "vs_deposit_4_75": "beats"
+    }
+  },
+  "csv": "/Users/namnguyen/Documents/Cursor/stock/vn_stock/data/screening/crypto_engines_on_vn.csv"
+}

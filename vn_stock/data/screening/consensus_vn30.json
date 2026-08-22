@@ -1,0 +1,9 @@
+{
+  "criteria": {
+    "consensus": ">= 2/3 long",
+    "data_cutoff": "2024-01-01",
+    "combined_fundamental": true
+  },
+  "tier_full_3of3": [],
+  "tier_strong_2of3": []
+}

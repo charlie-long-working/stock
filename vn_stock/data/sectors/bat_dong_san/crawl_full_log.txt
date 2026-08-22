@@ -1,0 +1,550 @@
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/symbols.json
+=== Fetch OHLCV (18 mã, ['1D', '1W', '1H']) → /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/ohlcv ===
+[1/54] Fetching DIG 1D...
+[2/54] Fetching DIG 1W...
+[3/54] Fetching DIG 1H...
+[4/54] Fetching CEO 1D...
+[5/54] Fetching CEO 1W...
+[6/54] Fetching CEO 1H...
+[7/54] Fetching VIC 1D...
+[8/54] Fetching VIC 1W...
+[9/54] Fetching VIC 1H...
+[10/54] Fetching VHM 1D...
+[11/54] Fetching VHM 1W...
+[12/54] Fetching VHM 1H...
+[13/54] Fetching L14 1D...
+[14/54] Fetching L14 1W...
+[15/54] Fetching L14 1H...
+[16/54] Fetching HAG 1D...
+[17/54] Fetching HAG 1W...
+[18/54] Fetching HAG 1H...
+[19/54] Fetching HQC 1D...
+[20/54] Fetching HQC 1W...
+[21/54] Fetching HQC 1H...
+[22/54] Fetching DLG 1D...
+[23/54] Fetching DLG 1W...
+[24/54] Fetching DLG 1H...
+[25/54] Fetching SCR 1D...
+[26/54] Fetching SCR 1W...
+[27/54] Fetching SCR 1H...
+[28/54] Fetching LCG 1D...
+[29/54] Fetching LCG 1W...
+[30/54] Fetching LCG 1H...
+[31/54] Fetching TCH 1D...
+[32/54] Fetching TCH 1W...
+[33/54] Fetching TCH 1H...
+[34/54] Fetching DXG 1D...
+[35/54] Fetching DXG 1W...
+[36/54] Fetching DXG 1H...
+[37/54] Fetching VRE 1D...
+[38/54] Fetching VRE 1W...
+[39/54] Fetching VRE 1H...
+[40/54] Fetching NLG 1D...
+[41/54] Fetching NLG 1W...
+[42/54] Fetching NLG 1H...
+[43/54] Fetching IJC 1D...
+[44/54] Fetching IJC 1W...
+[45/54] Fetching IJC 1H...
+[46/54] Fetching CKG 1D...
+[47/54] Fetching CKG 1W...
+[48/54] Fetching CKG 1H...
+[49/54] Fetching PDR 1D...
+[50/54] Fetching PDR 1W...
+[51/54] Fetching PDR 1H...
+[52/54] Fetching NVL 1D...
+[53/54] Fetching NVL 1W...
+[54/54] Fetching NVL 1H...
+=== Fetch fundamentals (annual) → /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/fundamentals ===
+[1/18] Fetching fundamentals for DIG...
+[2/18] Fetching fundamentals for CEO...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 48 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 48 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on CEO/income_statement, waiting 45s...
+[3/18] Fetching fundamentals for VIC...
+[4/18] Fetching fundamentals for VHM...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 28 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 28 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on VHM/ratios, waiting 45s...
+[5/18] Fetching fundamentals for L14...
+[6/18] Fetching fundamentals for HAG...
+[7/18] Fetching fundamentals for HQC...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 5 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 5 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on HQC/income_statement, waiting 45s...
+[8/18] Fetching fundamentals for DLG...
+[9/18] Fetching fundamentals for SCR...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 45 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 45 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on SCR/ratios, waiting 45s...
+[10/18] Fetching fundamentals for LCG...
+[11/18] Fetching fundamentals for TCH...
+[12/18] Fetching fundamentals for DXG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 19 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 19 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on DXG/income_statement, waiting 45s...
+[13/18] Fetching fundamentals for VRE...
+[14/18] Fetching fundamentals for NLG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 60 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 60 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on NLG/ratios, waiting 45s...
+[15/18] Fetching fundamentals for IJC...
+[16/18] Fetching fundamentals for CKG...
+[17/18] Fetching fundamentals for PDR...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 34 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 34 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on PDR/income_statement, waiting 45s...
+[18/18] Fetching fundamentals for NVL...
+=== Fetch fundamentals (quarter) → /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/fundamentals ===
+[1/18] Fetching fundamentals for DIG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 14 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 14 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on DIG/ratios, waiting 45s...
+[2/18] Fetching fundamentals for CEO...
+[3/18] Fetching fundamentals for VIC...
+[4/18] Fetching fundamentals for VHM...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 51 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 51 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on VHM/income_statement, waiting 45s...
+[5/18] Fetching fundamentals for L14...
+[6/18] Fetching fundamentals for HAG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 32 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 32 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on HAG/ratios, waiting 45s...
+[7/18] Fetching fundamentals for HQC...
+[8/18] Fetching fundamentals for DLG...
+[9/18] Fetching fundamentals for SCR...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 4 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 4 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on SCR/income_statement, waiting 45s...
+[10/18] Fetching fundamentals for LCG...
+[11/18] Fetching fundamentals for TCH...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 42 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 42 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on TCH/ratios, waiting 45s...
+[12/18] Fetching fundamentals for DXG...
+[13/18] Fetching fundamentals for VRE...
+[14/18] Fetching fundamentals for NLG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 16 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 16 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on NLG/income_statement, waiting 45s...
+[15/18] Fetching fundamentals for IJC...
+[16/18] Fetching fundamentals for CKG...
+
+⚠️ 
+============================================================
+⚠️  GIỚI HẠN API ĐÃ ĐẠT TỐI ĐA (Rate Limit Exceeded)
+============================================================
+
+📌 Bạn đã đạt giới hạn tối đa số lượt yêu cầu API trong 1 phút (minute).
+   (You have reached the maximum API request limit for this period)
+
+📊 Chi tiết (Details):
+   • Gói hiện tại: Khách (Guest)
+   • Giới hạn: 20 requests/phút
+   • Đã sử dụng: 20/20
+   • Chờ 56 giây để tiếp tục (Wait to retry)
+
+💡 Giải pháp (Solutions):
+   1️⃣ Chờ 56 giây rồi thử lại
+      (Wait and retry)
+   2️⃣ Tham gia gói thành viên tài trợ để sử dụng không bị gián đoạn
+      (Join sponsor membership for uninterrupted access)
+
+🚀 Nâng cấp (Upgrade):
+   • Phiên bản cộng đồng (60 request/phút - Community):
+     Đăng ký API key miễn phí: https://vnstocks.com/login
+   • Gói thành viên tài trợ (180-600 request/phút - Sponsor):
+     Tham gia: https://vnstocks.com/insiders-program
+     Sau khi tham gia tài trợ, cài bộ thư viện riêng vnstock_data theo hướng dẫn https://vnstocks.com/onboard-member
+
+============================================================
+
+
+[fundamentals] Rate limited on CKG/ratios, waiting 45s...
+[17/18] Fetching fundamentals for PDR...
+[18/18] Fetching fundamentals for NVL...
+=== Phân tích ===
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis/fundamental_scores.json
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis/backtest_1D.csv
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis/technical_signals.json (11 signals)
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis/combined_buy_candidates.json (10 candidates)
+Wrote /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis/report_2026-03-22.md
+
+Hoàn tất. Xem kết quả trong: /Users/namnguyen/Documents/Cursor/stock/vn_stock/data/sectors/bat_dong_san/analysis

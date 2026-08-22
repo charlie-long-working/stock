@@ -1,0 +1,9 @@
+{
+  "criteria": {
+    "tier1": "macd_rsi_entry_snapshot long + EMA bull (20/50)",
+    "tier2": "bull + RSI 30–48 + hist tăng, MACD hist vẫn < 0"
+  },
+  "tier1_signal_long": [],
+  "tier2_setup_pullback": [],
+  "skipped": []
+}

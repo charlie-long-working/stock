@@ -1,0 +1,120 @@
+# VN Hourly: cập nhật nến + tín hiệu → Telegram
+# Lịch ICT T2–T6 8:05–14:05 = UTC 1:05–7:05 Mon–Fri
+#
+# Secrets (Settings → Secrets → Actions):
+#   TELEGRAM_BOT_TOKEN
+#   TELEGRAM_CHAT_ID
+#   TB_CHECKOUT_TOKEN  — PAT (repo read) nếu Trading-bot là private
+#                        (cùng org + GITHUB_TOKEN đôi khi đủ; private thì nên dùng PAT)
+#
+# Repo Trading-bot mặc định: charlie-long-working/trading-bot
+# Đổi bằng biến repo Variable TB_REPO nếu cần.
+
+name: VN Hourly Telegram
+
+on:
+  schedule:
+    - cron: "5 1-7 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Bỏ qua cửa sổ giờ (force)"
+        required: false
+        default: "true"
+      dry_run:
+        description: "Không gửi Telegram"
+        required: false
+        default: "false"
+      heartbeat:
+        description: "Gửi heartbeat khi 0 signal"
+        required: false
+        default: "false"
+      symbols:
+        description: "Danh sách mã (trống = VN30/default)"
+        required: false
+        default: ""
+
+concurrency:
+  group: vn-hourly
+  cancel-in-progress: false
+
+jobs:
+  hourly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout stock (this repo)
+        uses: actions/checkout@v4
+        with:
+          path: stock
+
+      - name: Checkout Trading-bot (botdown engines)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.TB_REPO || 'charlie-long-working/trading-bot' }}
+          token: ${{ secrets.TB_CHECKOUT_TOKEN || secrets.GITHUB_TOKEN }}
+          path: Trading-bot
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: stock/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          pip install --quiet -r stock/requirements.txt
+          # botdown chỉ cần numpy/pandas (đã có); không sửa code Trading-bot
+
+      - name: Restore OHLCV cache
+        uses: actions/cache@v4
+        with:
+          path: stock/vn_stock/data/ohlcv
+          key: vn-ohlcv-${{ github.run_id }}
+          restore-keys: |
+            vn-ohlcv-
+
+      - name: Restore signal dedupe cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            stock/vn_stock/data/screening/hourly_vn_sent.json
+            stock/vn_stock/data/screening/telegram_sent_cache.json
+          key: vn-hourly-sent-${{ github.run_id }}
+          restore-keys: |
+            vn-hourly-sent-
+
+      - name: Run hourly VN session
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TZ: Asia/Ho_Chi_Minh
+          PYTHONPATH: ${{ github.workspace }}/stock:${{ github.workspace }}/Trading-bot
+        working-directory: stock
+        run: |
+          EXTRA=""
+          FORCE="${{ github.event.inputs.force || 'false' }}"
+          DRY="${{ github.event.inputs.dry_run || 'false' }}"
+          HB="${{ github.event.inputs.heartbeat || 'false' }}"
+          SYMS="${{ github.event.inputs.symbols || '' }}"
+          # schedule luôn trong cửa sổ UTC 1–7; workflow_dispatch có thể --force
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$FORCE" = "true" ]; then
+            EXTRA="$EXTRA --force"
+          fi
+          if [ "$DRY" = "true" ]; then EXTRA="$EXTRA --dry-run"; fi
+          if [ "$HB" = "true" ]; then EXTRA="$EXTRA --heartbeat"; fi
+          if [ -n "$SYMS" ]; then EXTRA="$EXTRA --symbols $SYMS"; fi
+          echo "Run EXTRA=$EXTRA TZ=$TZ"
+          python -m vn_stock.scripts.run_hourly_vn_session --delay 3.5 $EXTRA
+
+      - name: Upload snapshot artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hourly-vn-snapshot
+          path: |
+            stock/vn_stock/data/screening/hourly_vn_snapshot.json
+            stock/vn_stock/data/screening/hourly_vn_*.json
+          if-no-files-found: ignore
+          retention-days: 14

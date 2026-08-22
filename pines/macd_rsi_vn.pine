@@ -1,0 +1,57 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+//@version=5
+strategy("VN MACD+RSI (macd_rsi.py)", overlay=true, margin_long=100, margin_short=100,
+     default_qty_type=strategy.percent_of_equity, default_qty_value=100,
+     commission_type=strategy.commission.percent, commission_value=0.1,
+     pyramiding=0, calc_on_order_fills=false, process_orders_on_close=true)
+
+// === Khớp MACDRSIParams trong vn_stock/strategies/macd_rsi.py ===
+fastLen   = input.int(12, "MACD fast", minval=1)
+slowLen   = input.int(26, "MACD slow", minval=1)
+sigLen    = input.int(9,  "MACD signal", minval=1)
+rsiLen    = input.int(14, "RSI length", minval=2)
+rsiOb     = input.float(70.0, "RSI overbought (long cần < ngưỡng này)", step=0.5)
+atrLen    = input.int(14, "ATR length", minval=1)
+atrSlMult = input.float(1.5, "ATR SL ×", step=0.1)
+atrTpMult = input.float(2.5, "ATR TP ×", step=0.1)
+showLevels = input.bool(true, "Vẽ SL/TP tại bar vào lệnh")
+
+[macdLine, signalLine, hist] = ta.macd(close, fastLen, slowLen, sigLen)
+rsi = ta.rsi(close, rsiLen)
+atr = ta.atr(atrLen)
+
+histPrev = hist[1]
+histNow  = hist
+
+// LONG: prev_hist <= 0 < cur_hist AND RSI < overbought
+longCond = not na(histPrev) and not na(histNow) and histPrev <= 0 and histNow > 0 and rsi < rsiOb
+
+// EXIT tín hiệu (Python): MACD hist cắt xuống 0 — đóng long khi có cross down
+exitSignal = not na(histPrev) and not na(histNow) and histPrev >= 0 and histNow < 0
+
+var float entrySl = na
+var float entryTp = na
+
+if longCond and strategy.position_size == 0
+    float sl = close - atrSlMult * atr
+    float tp = close + atrTpMult * atr
+    entrySl := sl
+    entryTp := tp
+    strategy.entry("Long", strategy.long)
+    strategy.exit("X", "Long", stop=sl, limit=tp)
+
+if exitSignal and strategy.position_size > 0
+    strategy.close("Long", comment="MACD cross down")
+    entrySl := na
+    entryTp := na
+
+// Hiển thị (chỉ bar vào)
+plotshape(longCond and strategy.position_size[1] == 0 ? low : na, title="Long signal", style=shape.triangleup,
+     location=location.belowbar, size=size.small, color=color.new(color.green, 0))
+plotshape(exitSignal ? high : na, title="Exit signal", style=shape.triangledown,
+     location=location.abovebar, size=size.small, color=color.new(color.orange, 0))
+
+plot(showLevels and not na(entrySl) ? entrySl : na, "SL ref", color=color.red, style=plot.style_linebr)
+plot(showLevels and not na(entryTp) ? entryTp : na, "TP ref", color=color.green, style=plot.style_linebr)
+
+// Ghi chú: ta.rsi / ta.atr dùng Wilder; Python dùng công thức gần tương đương — có thể lệch vài bar nhỏ.

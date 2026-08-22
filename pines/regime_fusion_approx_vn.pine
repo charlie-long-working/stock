@@ -1,0 +1,127 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+//@version=5
+// XẤP XỈ regime_fusion.py: regime (SMA20/50 + co hẹp biến động) + FVG bull + demand zone (3 nến + bật giá).
+// KHÔNG port order_blocks (bull OB) — logic OB trong Python phức tạp hơn.
+strategy("VN Regime Fusion APPROX (regime_fusion.py)", overlay=true, margin_long=100, margin_short=100,
+     default_qty_type=strategy.percent_of_equity, default_qty_value=100,
+     commission_type=strategy.commission.percent, commission_value=0.1,
+     pyramiding=0, process_orders_on_close=true)
+
+shortP = input.int(20, "Regime short MA (SMA)", minval=2)
+longP  = input.int(50, "Regime long MA (SMA)", minval=2)
+volP   = input.int(20, "Volatility window", minval=2)
+fvgLookback = input.int(30, "FVG lookback (bars)", minval=5)
+zoneLookback = input.int(50, "Demand zone lookback", minval=10)
+zoneExpPct = input.float(0.3, "Demand: expansion % từ mid", step=0.1)
+tolPct = input.float(0.1, "Tolerance % vùng giá (như price_at_*)", step=0.05)
+requireVol = input.bool(false, "Volume confirm (Python: require_volume_confirmation)")
+
+// --- Regime (regime.py): SMA ngắn/dài + vol_contracting ---
+smaS = ta.sma(close, shortP)
+smaL = ta.sma(close, longP)
+recentStd = ta.stdev(close, volP)
+prevStd = ta.stdev(close, volP)[volP]
+volContracting = prevStd > 0 and recentStd < prevStd * 0.8
+
+int regime = 0  // 0 bull, 1 bear, 2 sideways
+if smaS > smaL and not volContracting
+    regime := 0
+else if smaS < smaL
+    regime := 1
+else
+    regime := 2
+
+// get_rules_for_regime: mọi regime đều allow_long=True trong code hiện tại
+allowLong = true
+volOk = not requireVol or volume > ta.sma(volume, 20)
+
+// TP % theo rules.py (bull: None → không đặt limit; bear 3%; sideways 2%)
+tpPct = regime == 0 ? na : regime == 1 ? 0.03 : 0.02
+
+// --- FVG bull: high[i] < low[i+2] → bottom=high oldest, top=low newest (technical.py) ---
+// Trên chart hiện tại: oldest của bộ 3 = bar [b+2], newest = bar [b]
+fvg_touch() =>
+    float zoneBot = na
+    float zoneTop = na
+    bool hit = false
+    int maxB = math.min(fvgLookback - 2, 50)
+    for b = 0 to maxB
+        if high[b + 2] < low[b]
+            float bot = high[b + 2]
+            float top = low[b]
+            float w = top - bot
+            float tol = w > 0 ? w * (tolPct / 100.0) : close * 0.001
+            if close >= bot - tol and close <= top + tol
+                zoneBot := bot
+                zoneTop := top
+                hit := true
+                break
+    [hit, zoneBot, zoneTop]
+
+// --- Demand zone: 3-bar base then impulse up (supply_demand_zones) ---
+// Base: offsets s+2, s+1, s (oldest → newest); impulse tại s-1
+demand_touch() =>
+    float zBot = na
+    float zTop = na
+    bool hit = false
+    for s = 3 to zoneLookback
+        float bh = math.max(high[s + 2], math.max(high[s + 1], high[s]))
+        float bl = math.min(low[s + 2], math.min(low[s + 1], low[s]))
+        float mid = (bh + bl) / 2.0
+        if mid > 0
+            float ck = close[s - 1]
+            if (ck - bh) / mid * 100.0 >= zoneExpPct
+                float w = bh - bl
+                float tol = w > 0 ? w * (tolPct / 100.0) : close * 0.001
+                if close >= bl - tol and close <= bh + tol
+                    zBot := bl
+                    zTop := bh
+                    hit := true
+                    break
+    [hit, zBot, zTop]
+
+[fvgHit, fvgBot, fvgTop] = fvg_touch()
+[demHit, demBot, demTop] = demand_touch()
+
+// Ưu tiên giống Python: OB (bỏ) → FVG → demand
+longCond = allowLong and volOk and barstate.isconfirmed and (fvgHit or demHit)
+
+float slPrice = na
+float tpPrice = na
+if fvgHit
+    slPrice := fvgBot
+else if demHit
+    slPrice := demBot
+
+if not na(slPrice) and not na(tpPct)
+    tpPrice := close * (1.0 + tpPct)
+// bull regime: tpPct na → chỉ stop, không limit (hoặc bật TP ATR tùy chọn)
+useAtrTp = input.bool(false, "Bull: dùng TP theo ATR (vì rules TP%=na)")
+atrLen = input.int(14, "ATR cho TP bull", minval=1)
+atrTpM = input.float(2.5, "ATR TP × (bull)", step=0.1)
+atr = ta.atr(atrLen)
+if longCond and regime == 0 and useAtrTp and not na(slPrice)
+    tpPrice := close + atrTpM * atr
+
+var float plottedSl = na
+var float plottedTp = na
+
+if longCond and strategy.position_size == 0
+    plottedSl := slPrice
+    plottedTp := tpPrice
+    strategy.entry("Long", strategy.long)
+    if not na(slPrice)
+        if not na(tpPrice)
+            strategy.exit("X", "Long", stop=slPrice, limit=tpPrice)
+        else
+            strategy.exit("X", "Long", stop=slPrice)
+
+// Không có exit MACD như fusion Python — đóng theo stop/limit hoặc thủ công
+plotshape(longCond and strategy.position_size[1] == 0 ? low : na, "Long (approx)", style=shape.triangleup,
+     location=location.belowbar, size=size.normal, color=color.new(color.lime, 0))
+
+plot(not na(plottedSl) ? plottedSl : na, "SL ref", color=color.red, style=plot.style_linebr)
+plot(not na(plottedTp) ? plottedTp : na, "TP ref", color=color.green, style=plot.style_linebr)
+
+// Màu nền regime (nhẹ)
+bgcolor(regime == 0 ? color.new(color.green, 92) : regime == 1 ? color.new(color.red, 92) : color.new(color.gray, 92))

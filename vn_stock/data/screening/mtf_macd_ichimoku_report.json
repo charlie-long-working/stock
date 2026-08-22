@@ -1,0 +1,735 @@
+{
+  "generated_at": "2026-08-23T01:03:36.382661",
+  "symbols": [
+    "VCB",
+    "BID",
+    "TCB",
+    "FPT",
+    "HPG",
+    "MWG",
+    "MSN",
+    "GAS",
+    "VHM",
+    "VNM"
+  ],
+  "coverage": {
+    "VCB": {
+      "1D": 1732,
+      "1W": 362,
+      "1H": 3338,
+      "4H": 1472
+    },
+    "BID": {
+      "1D": 1732,
+      "1W": 362,
+      "1H": 3338,
+      "4H": 1472
+    },
+    "TCB": {
+      "1D": 1732,
+      "1W": 362,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "FPT": {
+      "1D": 1732,
+      "1W": 362,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "HPG": {
+      "1D": 3763,
+      "1W": 787,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "MWG": {
+      "1D": 3026,
+      "1W": 632,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "MSN": {
+      "1D": 3765,
+      "1W": 787,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "GAS": {
+      "1D": 3561,
+      "1W": 744,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "VHM": {
+      "1D": 3479,
+      "1W": 772,
+      "1H": 3339,
+      "4H": 1472
+    },
+    "VNM": {
+      "1D": 3765,
+      "1W": 787,
+      "1H": 3339,
+      "4H": 1472
+    }
+  },
+  "summary_by_strategy_tf": {
+    "ichimoku|1D": {
+      "n_symbols": 10,
+      "avg_return_pct": 28.12,
+      "avg_hold_pct": 538.53,
+      "avg_alpha_pct": -510.41,
+      "avg_win_rate": 44.5,
+      "avg_max_dd_pct": 13.5,
+      "avg_sharpe": 3.06,
+      "beat_hold_pct": 10.0
+    },
+    "ichimoku|1H": {
+      "n_symbols": 10,
+      "avg_return_pct": 4.68,
+      "avg_hold_pct": 47.72,
+      "avg_alpha_pct": -43.04,
+      "avg_win_rate": 40.4,
+      "avg_max_dd_pct": 9.1,
+      "avg_sharpe": 1.26,
+      "beat_hold_pct": 10.0
+    },
+    "ichimoku|1W": {
+      "n_symbols": 2,
+      "avg_return_pct": 61.25,
+      "avg_hold_pct": 52.62,
+      "avg_alpha_pct": 8.62,
+      "avg_win_rate": 83.3,
+      "avg_max_dd_pct": 3.0,
+      "avg_sharpe": 18.46,
+      "beat_hold_pct": 50.0
+    },
+    "ichimoku|4H": {
+      "n_symbols": 10,
+      "avg_return_pct": 7.66,
+      "avg_hold_pct": 60.56,
+      "avg_alpha_pct": -52.9,
+      "avg_win_rate": 40.7,
+      "avg_max_dd_pct": 7.7,
+      "avg_sharpe": 1.47,
+      "beat_hold_pct": 10.0
+    },
+    "macd_rsi|1D": {
+      "n_symbols": 10,
+      "avg_return_pct": 90.33,
+      "avg_hold_pct": 464.51,
+      "avg_alpha_pct": -374.18,
+      "avg_win_rate": 44.7,
+      "avg_max_dd_pct": 31.6,
+      "avg_sharpe": 2.48,
+      "beat_hold_pct": 10.0
+    },
+    "macd_rsi|1H": {
+      "n_symbols": 10,
+      "avg_return_pct": 23.24,
+      "avg_hold_pct": 41.43,
+      "avg_alpha_pct": -18.19,
+      "avg_win_rate": 41.9,
+      "avg_max_dd_pct": 16.2,
+      "avg_sharpe": 1.48,
+      "beat_hold_pct": 30.0
+    },
+    "macd_rsi|1W": {
+      "n_symbols": 1,
+      "avg_return_pct": 5.22,
+      "avg_hold_pct": 55.3,
+      "avg_alpha_pct": -50.08,
+      "avg_win_rate": 50.0,
+      "avg_max_dd_pct": 12.5,
+      "avg_sharpe": 2.56,
+      "beat_hold_pct": 0.0
+    },
+    "macd_rsi|4H": {
+      "n_symbols": 10,
+      "avg_return_pct": 19.54,
+      "avg_hold_pct": 50.75,
+      "avg_alpha_pct": -31.2,
+      "avg_win_rate": 42.5,
+      "avg_max_dd_pct": 17.6,
+      "avg_sharpe": 1.63,
+      "beat_hold_pct": 10.0
+    }
+  },
+  "ranking": [
+    {
+      "strategy": "ichimoku",
+      "interval": "1W",
+      "score": 24.34,
+      "n_symbols": 2,
+      "avg_return_pct": 61.25,
+      "avg_hold_pct": 52.62,
+      "avg_alpha_pct": 8.62,
+      "avg_win_rate": 83.3,
+      "avg_max_dd_pct": 3.0,
+      "avg_sharpe": 18.46,
+      "beat_hold_pct": 50.0
+    },
+    {
+      "strategy": "macd_rsi",
+      "interval": "1H",
+      "score": -3.45,
+      "n_symbols": 10,
+      "avg_return_pct": 23.24,
+      "avg_hold_pct": 41.43,
+      "avg_alpha_pct": -18.19,
+      "avg_win_rate": 41.9,
+      "avg_max_dd_pct": 16.2,
+      "avg_sharpe": 1.48,
+      "beat_hold_pct": 30.0
+    },
+    {
+      "strategy": "macd_rsi",
+      "interval": "4H",
+      "score": -10.75,
+      "n_symbols": 10,
+      "avg_return_pct": 19.54,
+      "avg_hold_pct": 50.75,
+      "avg_alpha_pct": -31.2,
+      "avg_win_rate": 42.5,
+      "avg_max_dd_pct": 17.6,
+      "avg_sharpe": 1.63,
+      "beat_hold_pct": 10.0
+    },
+    {
+      "strategy": "ichimoku",
+      "interval": "1H",
+      "score": -14.42,
+      "n_symbols": 10,
+      "avg_return_pct": 4.68,
+      "avg_hold_pct": 47.72,
+      "avg_alpha_pct": -43.04,
+      "avg_win_rate": 40.4,
+      "avg_max_dd_pct": 9.1,
+      "avg_sharpe": 1.26,
+      "beat_hold_pct": 10.0
+    },
+    {
+      "strategy": "macd_rsi",
+      "interval": "1W",
+      "score": -16.03,
+      "n_symbols": 1,
+      "avg_return_pct": 5.22,
+      "avg_hold_pct": 55.3,
+      "avg_alpha_pct": -50.08,
+      "avg_win_rate": 50.0,
+      "avg_max_dd_pct": 12.5,
+      "avg_sharpe": 2.56,
+      "beat_hold_pct": 0.0
+    },
+    {
+      "strategy": "ichimoku",
+      "interval": "4H",
+      "score": -17.99,
+      "n_symbols": 10,
+      "avg_return_pct": 7.66,
+      "avg_hold_pct": 60.56,
+      "avg_alpha_pct": -52.9,
+      "avg_win_rate": 40.7,
+      "avg_max_dd_pct": 7.7,
+      "avg_sharpe": 1.47,
+      "beat_hold_pct": 10.0
+    },
+    {
+      "strategy": "macd_rsi",
+      "interval": "1D",
+      "score": -150.08,
+      "n_symbols": 10,
+      "avg_return_pct": 90.33,
+      "avg_hold_pct": 464.51,
+      "avg_alpha_pct": -374.18,
+      "avg_win_rate": 44.7,
+      "avg_max_dd_pct": 31.6,
+      "avg_sharpe": 2.48,
+      "beat_hold_pct": 10.0
+    },
+    {
+      "strategy": "ichimoku",
+      "interval": "1D",
+      "score": -201.01,
+      "n_symbols": 10,
+      "avg_return_pct": 28.12,
+      "avg_hold_pct": 538.53,
+      "avg_alpha_pct": -510.41,
+      "avg_win_rate": 44.5,
+      "avg_max_dd_pct": 13.5,
+      "avg_sharpe": 3.06,
+      "beat_hold_pct": 10.0
+    }
+  ],
+  "vn_policy_rates": {
+    "as_of": "2026-08-01",
+    "refinancing_rate_pct": 4.5,
+    "source": "SBV QĐ 1123/QĐ-NHNN (from 2023-06-19); deposit caps QĐ 2411/QĐ-NHNN",
+    "rediscount_rate_pct": 3.0,
+    "overnight_rate_pct": 5.0,
+    "deposit_cap_under_1m_pct": 0.5,
+    "deposit_cap_1m_6m_pct": 4.75,
+    "deposit_rate_legacy_pct": 4.75,
+    "notes": "Policy rates unchanged since Jun-2023: refinancing 4.5%, rediscount 3.0%, overnight 5.0%. Deposit ceiling 1–<6m: 4.75% (banks); 5.25% for people's credit funds / microfinance. 6m+ deposits: market-set by banks."
+  },
+  "csv": "/Users/namnguyen/Documents/Cursor/stock/vn_stock/data/screening/mtf_macd_ichimoku_backtest.csv",
+  "note": "Long-only ATR exit (SL 1.5×ATR, TP 2.5×ATR). 4H resampled from 1H. Not investment advice.",
+  "refined": {
+    "generated_at": "2026-08-23T01:05:32.930889",
+    "stability_full_sample_rank": [
+      {
+        "rank": 1,
+        "strategy": "ichimoku",
+        "tf": "1D",
+        "pos_rate": "80%",
+        "avg_ret": "+28%",
+        "avg_dd": "13.5%",
+        "note": "Ít lệnh, DD thấp — ổn định nhất"
+      },
+      {
+        "rank": 2,
+        "strategy": "macd_rsi",
+        "tf": "1D",
+        "pos_rate": "70%",
+        "avg_ret": "+90%",
+        "avg_dd": "31.6%",
+        "note": "Lợi nhuận cao hơn nhưng DD lớn"
+      },
+      {
+        "rank": 3,
+        "strategy": "macd_rsi",
+        "tf": "1H",
+        "pos_rate": "70%",
+        "avg_ret": "+23%",
+        "avg_dd": "16%",
+        "note": "Intraday; nhiễu hơn 1D"
+      }
+    ],
+    "botdown_pct_10_4": {
+      "EMA_on": {
+        "avg_ret": 80.1,
+        "avg_win": 41.9,
+        "pos": "7/10",
+        "detail": [
+          {
+            "symbol": "VCB",
+            "ret": 27.4,
+            "hold": 61.9,
+            "n": 17,
+            "win": 41.2,
+            "dd": 8.0
+          },
+          {
+            "symbol": "BID",
+            "ret": -3.0,
+            "hold": 60.8,
+            "n": 17,
+            "win": 29.4,
+            "dd": 22.2
+          },
+          {
+            "symbol": "TCB",
+            "ret": -6.0,
+            "hold": 192.5,
+            "n": 21,
+            "win": 28.6,
+            "dd": 27.7
+          },
+          {
+            "symbol": "FPT",
+            "ret": 83.9,
+            "hold": 255.9,
+            "n": 18,
+            "win": 55.6,
+            "dd": 8.0
+          },
+          {
+            "symbol": "HPG",
+            "ret": 300.1,
+            "hold": 1966.7,
+            "n": 45,
+            "win": 53.3,
+            "dd": 18.9
+          },
+          {
+            "symbol": "MWG",
+            "ret": 177.2,
+            "hold": 769.1,
+            "n": 44,
+            "win": 47.7,
+            "dd": 8.0
+          },
+          {
+            "symbol": "MSN",
+            "ret": -0.8,
+            "hold": 23.3,
+            "n": 36,
+            "win": 30.6,
+            "dd": 23.8
+          },
+          {
+            "symbol": "GAS",
+            "ret": 152.0,
+            "hold": 427.1,
+            "n": 30,
+            "win": 53.3,
+            "dd": 21.4
+          },
+          {
+            "symbol": "VHM",
+            "ret": 41.5,
+            "hold": 421.8,
+            "n": 21,
+            "win": 42.9,
+            "dd": 15.4
+          },
+          {
+            "symbol": "VNM",
+            "ret": 28.9,
+            "hold": 420.0,
+            "n": 33,
+            "win": 36.4,
+            "dd": 21.4
+          }
+        ]
+      },
+      "EMA_off": {
+        "avg_ret": 95.8,
+        "avg_win": 38.5,
+        "pos": "9/10",
+        "detail": [
+          {
+            "symbol": "VCB",
+            "ret": 143.2,
+            "hold": 51.2,
+            "n": 35,
+            "win": 48.6,
+            "dd": 18.9
+          },
+          {
+            "symbol": "BID",
+            "ret": 5.0,
+            "hold": 57.2,
+            "n": 43,
+            "win": 32.6,
+            "dd": 35.5
+          },
+          {
+            "symbol": "TCB",
+            "ret": 54.3,
+            "hold": 170.1,
+            "n": 41,
+            "win": 39.0,
+            "dd": 15.4
+          },
+          {
+            "symbol": "FPT",
+            "ret": 119.1,
+            "hold": 234.9,
+            "n": 36,
+            "win": 47.2,
+            "dd": 14.5
+          },
+          {
+            "symbol": "HPG",
+            "ret": 272.7,
+            "hold": 1872.7,
+            "n": 103,
+            "win": 39.8,
+            "dd": 43.8
+          },
+          {
+            "symbol": "MWG",
+            "ret": 172.5,
+            "hold": 966.9,
+            "n": 82,
+            "win": 40.2,
+            "dd": 22.2
+          },
+          {
+            "symbol": "MSN",
+            "ret": -15.0,
+            "hold": -10.2,
+            "n": 107,
+            "win": 29.9,
+            "dd": 43.6
+          },
+          {
+            "symbol": "GAS",
+            "ret": 111.6,
+            "hold": 444.0,
+            "n": 83,
+            "win": 37.3,
+            "dd": 35.5
+          },
+          {
+            "symbol": "VHM",
+            "ret": 92.2,
+            "hold": 421.8,
+            "n": 56,
+            "win": 39.3,
+            "dd": 40.1
+          },
+          {
+            "symbol": "VNM",
+            "ret": 2.7,
+            "hold": 436.6,
+            "n": 84,
+            "win": 31.0,
+            "dd": 62.2
+          }
+        ]
+      }
+    },
+    "window_2022": {
+      "macd_rsi": {
+        "n": 10,
+        "pos_pct": 60.0,
+        "avg_ret": 10.4,
+        "med_ret": 7.7,
+        "avg_win": 39.8,
+        "avg_dd": 26.7,
+        "detail": [
+          {
+            "symbol": "VCB",
+            "ret": 26.8,
+            "win": 42.4,
+            "dd": 17.0,
+            "n": 33
+          },
+          {
+            "symbol": "BID",
+            "ret": -22.9,
+            "win": 32.4,
+            "dd": 34.1,
+            "n": 34
+          },
+          {
+            "symbol": "TCB",
+            "ret": 42.6,
+            "win": 53.1,
+            "dd": 19.8,
+            "n": 32
+          },
+          {
+            "symbol": "FPT",
+            "ret": 43.4,
+            "win": 51.9,
+            "dd": 17.8,
+            "n": 27
+          },
+          {
+            "symbol": "HPG",
+            "ret": 5.0,
+            "win": 37.8,
+            "dd": 24.3,
+            "n": 37
+          },
+          {
+            "symbol": "MWG",
+            "ret": 63.8,
+            "win": 52.8,
+            "dd": 21.2,
+            "n": 36
+          },
+          {
+            "symbol": "MSN",
+            "ret": -29.5,
+            "win": 31.4,
+            "dd": 39.8,
+            "n": 35
+          },
+          {
+            "symbol": "GAS",
+            "ret": -0.7,
+            "win": 32.4,
+            "dd": 26.1,
+            "n": 34
+          },
+          {
+            "symbol": "VHM",
+            "ret": 10.4,
+            "win": 37.5,
+            "dd": 32.3,
+            "n": 32
+          },
+          {
+            "symbol": "VNM",
+            "ret": -34.6,
+            "win": 26.3,
+            "dd": 34.6,
+            "n": 38
+          }
+        ]
+      },
+      "ichimoku": {
+        "n": 10,
+        "pos_pct": 70.0,
+        "avg_ret": 7.4,
+        "med_ret": 6.7,
+        "avg_win": 47.2,
+        "avg_dd": 9.1,
+        "detail": [
+          {
+            "symbol": "VCB",
+            "ret": -5.1,
+            "win": 16.7,
+            "dd": 16.3,
+            "n": 12
+          },
+          {
+            "symbol": "BID",
+            "ret": 2.4,
+            "win": 25.0,
+            "dd": 7.3,
+            "n": 4
+          },
+          {
+            "symbol": "TCB",
+            "ret": 21.9,
+            "win": 66.7,
+            "dd": 3.0,
+            "n": 9
+          },
+          {
+            "symbol": "FPT",
+            "ret": 11.7,
+            "win": 66.7,
+            "dd": 5.8,
+            "n": 6
+          },
+          {
+            "symbol": "HPG",
+            "ret": -11.1,
+            "win": 22.2,
+            "dd": 13.6,
+            "n": 9
+          },
+          {
+            "symbol": "MWG",
+            "ret": 36.7,
+            "win": 75.0,
+            "dd": 4.3,
+            "n": 8
+          },
+          {
+            "symbol": "MSN",
+            "ret": 10.6,
+            "win": 75.0,
+            "dd": 5.0,
+            "n": 4
+          },
+          {
+            "symbol": "GAS",
+            "ret": 2.8,
+            "win": 60.0,
+            "dd": 8.4,
+            "n": 5
+          },
+          {
+            "symbol": "VHM",
+            "ret": 15.7,
+            "win": 50.0,
+            "dd": 9.6,
+            "n": 8
+          },
+          {
+            "symbol": "VNM",
+            "ret": -11.6,
+            "win": 14.3,
+            "dd": 17.6,
+            "n": 7
+          }
+        ]
+      },
+      "confluence": {
+        "n": 10,
+        "pos_pct": 50.0,
+        "avg_ret": 6.4,
+        "med_ret": -1.1,
+        "avg_win": 45.1,
+        "avg_dd": 9.5,
+        "detail": [
+          {
+            "symbol": "VCB",
+            "ret": 17.0,
+            "win": 66.7,
+            "dd": 2.5,
+            "n": 6
+          },
+          {
+            "symbol": "BID",
+            "ret": -8.7,
+            "win": 25.0,
+            "dd": 17.7,
+            "n": 8
+          },
+          {
+            "symbol": "TCB",
+            "ret": 15.1,
+            "win": 55.6,
+            "dd": 5.7,
+            "n": 9
+          },
+          {
+            "symbol": "FPT",
+            "ret": 1.7,
+            "win": 42.9,
+            "dd": 5.7,
+            "n": 7
+          },
+          {
+            "symbol": "HPG",
+            "ret": -8.5,
+            "win": 36.4,
+            "dd": 11.4,
+            "n": 11
+          },
+          {
+            "symbol": "MWG",
+            "ret": 22.2,
+            "win": 50.0,
+            "dd": 14.8,
+            "n": 14
+          },
+          {
+            "symbol": "MSN",
+            "ret": -6.7,
+            "win": 33.3,
+            "dd": 12.0,
+            "n": 6
+          },
+          {
+            "symbol": "GAS",
+            "ret": -3.8,
+            "win": 33.3,
+            "dd": 8.8,
+            "n": 6
+          },
+          {
+            "symbol": "VHM",
+            "ret": 42.6,
+            "win": 70.0,
+            "dd": 6.8,
+            "n": 10
+          },
+          {
+            "symbol": "VNM",
+            "ret": -6.3,
+            "win": 37.5,
+            "dd": 9.8,
+            "n": 8
+          }
+        ]
+      }
+    },
+    "recommended_playbook": {
+      "bias_tf": "1W — Ichimoku cloud bull hoặc EMA20>EMA50",
+      "entry_tf": "1D — MACD hist cross lên 0 + RSI<70 + giá trên mây Ichimoku (bull cloud)",
+      "timing_tf": "H4/H1 chỉ refine entry, không trade standalone",
+      "exit": "ATR SL1.5 / TP2.5 hoặc TP10%/SL4% + EMA filter",
+      "macro": "Lãi suất điều hành thấp ổn định (4.5%) từ 6/2023 — hỗ trợ risk-on cổ phiếu; trần TG 1-<6m 4.75%"
+    }
+  }
+}

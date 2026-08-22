@@ -1,0 +1,267 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// MA200 + Neutral + MACD/RSI div — Long/Short, TP/SL %, so sánh Buy&Hold
+//@version=5
+strategy("MA200 Neutral + Div (L/S, TP/SL % vs B&H)", overlay=true, margin_long=100, margin_short=100,
+     default_qty_type=strategy.percent_of_equity, default_qty_value=100,
+     commission_type=strategy.commission.percent, commission_value=0.1,
+     pyramiding=0, process_orders_on_close=true, max_labels_count=50)
+
+// ═══════════════════════════════════════════════════════════════════════
+// Strategy — vào / ra
+// ═══════════════════════════════════════════════════════════════════════
+
+g_strat = "Strategy — vào / ra"
+i_buyMacd = input.bool(true, "Long: Bull MACD div", group=g_strat)
+i_buyRsi = input.bool(true, "Long: Bull RSI div", group=g_strat)
+i_sellMacd = input.bool(true, "Short: Bear MACD div", group=g_strat)
+i_sellRsi = input.bool(true, "Short: Bear RSI div", group=g_strat)
+i_requireNeutral = input.bool(false, "Chỉ vào lệnh khi Neutral ON", group=g_strat)
+
+g_risk = "TP / SL (% trên giá vào)"
+i_tpPct = input.float(5.0, "Take profit %", minval=0.05, step=0.05, group=g_risk)
+i_slPct = input.float(2.5, "Stop loss %", minval=0.05, step=0.05, group=g_risk)
+i_tradeShort = input.bool(true, "Cho phép short tại bear div", group=g_risk)
+i_exitLongOnBear = input.bool(true, "Đóng long khi bear div (ngoài TP/SL)", group=g_risk)
+i_coverShortOnBull = input.bool(true, "Đóng short khi bull div (ngoài TP/SL)", group=g_risk)
+
+g_vis = "Hiển thị"
+i_plotOnConfirmBar = input.bool(true, "Div: đúng nến xác nhận (offset=0)", group=g_vis)
+i_showExecMarkers = input.bool(true, "Nhãn MUA / BÁN / SHORT / COVER", group=g_vis)
+
+g_cmp = "So sánh Buy & Hold"
+i_showCompareTable = input.bool(true, "Bảng % Strategy vs Buy&Hold", group=g_cmp)
+
+// ═══════════════════════════════════════════════════════════════════════
+// MA200
+// ═══════════════════════════════════════════════════════════════════════
+
+i_ma200Period = input.int(200, "MA200 period", minval=2, group="MA200")
+i_showMA200 = input.bool(true, "Show MA200", group="MA200")
+i_showLastLabel = input.bool(true, "Nhãn bar cuối", group="MA200")
+
+// ═══════════════════════════════════════════════════════════════════════
+// Neutral index
+// ═══════════════════════════════════════════════════════════════════════
+
+g_neutral = "Neutral index"
+i_shortMa = input.int(20, "MA short", group=g_neutral, minval=1)
+i_longMa = input.int(50, "MA long", group=g_neutral, minval=1)
+i_volPeriod = input.int(20, "Volatility (stdev window)", group=g_neutral, minval=2)
+
+g_neutral_filter = "Neutral thresholds"
+i_maxSpreadPct = input.float(1.0, "Max MA spread (%)", group=g_neutral_filter, minval=0.05, step=0.05)
+i_maxVolRatio = input.float(0.8, "Max volRatio (contraction)", group=g_neutral_filter, minval=0.05, step=0.05)
+i_minVolRatio = input.float(0.2, "Min volRatio (score=100)", group=g_neutral_filter, minval=0.05, step=0.05)
+i_useMa200Filter = input.bool(true, "Use MA200 distance filter", group=g_neutral_filter)
+i_maxMa200DistPct = input.float(10.0, "Max |price-MA200| (%)", group=g_neutral_filter, minval=0.5, step=0.5)
+i_threshold = input.float(70.0, "Neutral score threshold", group=g_neutral_filter, minval=0, maxval=100, step=1)
+
+g_neutral_show = "Neutral show"
+i_showNeutralBg = input.bool(true, "Background khi Neutral ON", group=g_neutral_show)
+
+f_clamp(_x, _min, _max) =>
+    math.max(_min, math.min(_max, _x))
+
+shortMa = ta.sma(close, i_shortMa)
+longMa = ta.sma(close, i_longMa)
+spreadPct = (not na(longMa) and longMa != 0.0) ? math.abs(shortMa - longMa) / longMa * 100.0 : na
+
+recentStd = ta.stdev(close, i_volPeriod)
+prevStd = ta.stdev(close[i_volPeriod], i_volPeriod)
+volRatio = (prevStd > 0.0) ? recentStd / prevStd : na
+volContracting = not na(volRatio) and volRatio <= i_maxVolRatio
+
+trendScore = not na(spreadPct) ? f_clamp(100.0 * (1.0 - spreadPct / i_maxSpreadPct), 0.0, 100.0) : 0.0
+volScore = not na(volRatio) ? f_clamp(100.0 * (i_maxVolRatio - volRatio) / math.max(i_maxVolRatio - i_minVolRatio, 0.0001), 0.0, 100.0) : 0.0
+
+ma200 = ta.sma(close, i_ma200Period)
+ma200DistPct = (not na(ma200) and ma200 != 0.0) ? math.abs(close - ma200) / ma200 * 100.0 : na
+ma200Score = i_useMa200Filter and not na(ma200DistPct) ? f_clamp(100.0 * (1.0 - ma200DistPct / i_maxMa200DistPct), 0.0, 100.0) : 50.0
+
+neutralScore = 0.45 * trendScore + 0.35 * volScore + 0.20 * ma200Score
+neutralMode = neutralScore >= i_threshold and volContracting
+
+// ═══════════════════════════════════════════════════════════════════════
+// Divergence
+// ═══════════════════════════════════════════════════════════════════════
+
+g_div = "Divergence"
+i_pivotLeft = input.int(5, "Pivot left", group=g_div, minval=1)
+i_pivotRight = input.int(5, "Pivot right (xác nhận)", group=g_div, minval=1)
+i_showMacdDiv = input.bool(true, "Show MACD div", group=g_div)
+i_showRsiDiv = input.bool(true, "Show RSI div", group=g_div)
+i_macdFast = input.int(12, "MACD fast", group=g_div, minval=1)
+i_macdSlow = input.int(26, "MACD slow", group=g_div, minval=2)
+i_macdSignal = input.int(9, "MACD signal", group=g_div, minval=1)
+i_rsiLen = input.int(14, "RSI length", group=g_div, minval=2)
+
+[macdLine, macdSignalLine, macdHist] = ta.macd(close, i_macdFast, i_macdSlow, i_macdSignal)
+rsi = ta.rsi(close, i_rsiLen)
+
+plPrice = ta.pivotlow(low, i_pivotLeft, i_pivotRight)
+phPrice = ta.pivothigh(high, i_pivotLeft, i_pivotRight)
+
+var float prevPLPrice_macd = na
+var float prevPLMacd = na
+var float prevPHPrice_macd = na
+var float prevPHMacd = na
+var float prevPLPrice_rsi = na
+var float prevPLRsi = na
+var float prevPHPrice_rsi = na
+var float prevPHRsi = na
+
+bullDivMacd = false
+bearDivMacd = false
+bullDivRsi = false
+bearDivRsi = false
+
+if not na(plPrice)
+    macdAtPL = macdLine[i_pivotRight]
+    rsiAtPL = rsi[i_pivotRight]
+    bullDivMacd := not na(prevPLPrice_macd) and plPrice < prevPLPrice_macd and not na(macdAtPL) and macdAtPL > prevPLMacd
+    prevPLPrice_macd := plPrice
+    prevPLMacd := macdAtPL
+    bullDivRsi := not na(prevPLPrice_rsi) and plPrice < prevPLPrice_rsi and not na(rsiAtPL) and rsiAtPL > prevPLRsi
+    prevPLPrice_rsi := plPrice
+    prevPLRsi := rsiAtPL
+
+if not na(phPrice)
+    macdAtPH = macdLine[i_pivotRight]
+    rsiAtPH = rsi[i_pivotRight]
+    bearDivMacd := not na(prevPHPrice_macd) and phPrice > prevPHPrice_macd and not na(macdAtPH) and macdAtPH < prevPHMacd
+    prevPHPrice_macd := phPrice
+    prevPHMacd := macdAtPH
+    bearDivRsi := not na(prevPHPrice_rsi) and phPrice > prevPHPrice_rsi and not na(rsiAtPH) and rsiAtPH < prevPHRsi
+    prevPHPrice_rsi := phPrice
+    prevPHRsi := rsiAtPH
+
+bullSignal = (i_buyMacd and bullDivMacd) or (i_buyRsi and bullDivRsi)
+bearSignal = (i_sellMacd and bearDivMacd) or (i_sellRsi and bearDivRsi)
+neutralOk = not i_requireNeutral or neutralMode
+longOk = bullSignal and neutralOk
+shortOk = bearSignal and neutralOk and i_tradeShort
+
+// ═══════════════════════════════════════════════════════════════════════
+// Thoát: SL → TP → tín hiệu đối nghịch (TP/SL không áp cùng nến vào lệnh)
+// ═══════════════════════════════════════════════════════════════════════
+
+avgPrice = strategy.position_avg_price
+longEb = strategy.opentrades > 0 and strategy.position_size > 0 ? strategy.opentrades.entry_bar_index(strategy.opentrades - 1) : na
+shortEb = strategy.opentrades > 0 and strategy.position_size < 0 ? strategy.opentrades.entry_bar_index(strategy.opentrades - 1) : na
+
+longMature = strategy.position_size > 0 and not na(longEb) and bar_index > longEb
+shortMature = strategy.position_size < 0 and not na(shortEb) and bar_index > shortEb
+
+longSL = longMature and close <= avgPrice * (1.0 - i_slPct / 100.0)
+longTP = longMature and close >= avgPrice * (1.0 + i_tpPct / 100.0)
+shortSL = shortMature and close >= avgPrice * (1.0 + i_slPct / 100.0)
+shortTP = shortMature and close <= avgPrice * (1.0 - i_tpPct / 100.0)
+
+longSigExit = strategy.position_size > 0 and i_exitLongOnBear and bearSignal
+shortSigExit = strategy.position_size < 0 and i_coverShortOnBull and bullSignal
+
+if strategy.position_size > 0
+    if longSL
+        strategy.close("Long", comment="SL")
+    else if longTP
+        strategy.close("Long", comment="TP")
+    else if longSigExit
+        strategy.close("Long", comment="Bear")
+
+if strategy.position_size < 0
+    if shortSL
+        strategy.close("Short", comment="SL")
+    else if shortTP
+        strategy.close("Short", comment="TP")
+    else if shortSigExit
+        strategy.close("Short", comment="Bull")
+
+if strategy.position_size == 0
+    if longOk
+        strategy.entry("Long", strategy.long, comment="Bull")
+    else if shortOk
+        strategy.entry("Short", strategy.short, comment="Bear")
+
+// ═══════════════════════════════════════════════════════════════════════
+// Nhãn khớp lệnh (bar trước flat → vào long/short)
+// ═══════════════════════════════════════════════════════════════════════
+
+pz = nz(strategy.position_size[1], 0)
+execLong = i_showExecMarkers and longOk and pz == 0
+execShort = i_showExecMarkers and shortOk and pz == 0 and not longOk
+
+// ═══════════════════════════════════════════════════════════════════════
+// Buy & Hold
+// ═══════════════════════════════════════════════════════════════════════
+
+var float firstClose = na
+if barstate.isfirst
+    firstClose := close
+
+bhMult = (not na(firstClose) and firstClose > 0) ? close / firstClose : na
+stratMult = strategy.initial_capital > 0 ? strategy.equity / strategy.initial_capital : na
+bhReturnPct = not na(bhMult) ? 100.0 * (bhMult - 1.0) : na
+stratReturnPct = not na(stratMult) ? 100.0 * (stratMult - 1.0) : na
+
+var table cmpTbl = na
+if barstate.islast and i_showCompareTable
+    if na(cmpTbl)
+        cmpTbl := table.new(position.top_right, 2, 4, bgcolor=color.new(color.black, 85),
+             border_width=1, border_color=color.new(color.gray, 50))
+        table.cell(cmpTbl, 0, 0, "Chỉ số", text_color=color.white, text_size=size.small)
+        table.cell(cmpTbl, 1, 0, "Giá trị", text_color=color.white, text_size=size.small)
+        table.cell(cmpTbl, 0, 1, "Strategy (%)", text_color=color.silver, text_size=size.small)
+        table.cell(cmpTbl, 0, 2, "Buy & Hold (%)", text_color=color.silver, text_size=size.small)
+        table.cell(cmpTbl, 0, 3, "Chênh (Str − B&H)", text_color=color.silver, text_size=size.small)
+    sTxt = na(stratReturnPct) ? "—" : str.tostring(stratReturnPct, "#.##") + "%"
+    bTxt = na(bhReturnPct) ? "—" : str.tostring(bhReturnPct, "#.##") + "%"
+    dVal = (na(stratReturnPct) or na(bhReturnPct)) ? na : stratReturnPct - bhReturnPct
+    dTxt = na(dVal) ? "—" : str.tostring(dVal, "#.##") + "%"
+    dCol = na(dVal) ? color.silver : dVal >= 0 ? color.lime : color.red
+    table.cell(cmpTbl, 1, 1, sTxt, text_color=color.white, text_size=size.small)
+    table.cell(cmpTbl, 1, 2, bTxt, text_color=color.white, text_size=size.small)
+    table.cell(cmpTbl, 1, 3, dTxt, text_color=dCol, text_size=size.small)
+
+// ═══════════════════════════════════════════════════════════════════════
+// Vẽ
+// ═══════════════════════════════════════════════════════════════════════
+
+plot(i_showMA200 ? ma200 : na, "MA200", color=color.new(color.blue, 0), linewidth=2)
+bgcolor(i_showNeutralBg and neutralMode ? color.new(color.lime, 88) : na)
+
+divPlotOffset = i_plotOnConfirmBar ? 0 : -i_pivotRight
+
+plotshape(i_showMacdDiv and bullDivMacd, title="Bull MACD div", style=shape.triangleup, location=location.belowbar,
+     color=color.new(color.green, 30), size=size.tiny, text="M", textcolor=color.black, offset=divPlotOffset)
+plotshape(i_showMacdDiv and bearDivMacd, title="Bear MACD div", style=shape.triangledown, location=location.abovebar,
+     color=color.new(color.red, 30), size=size.tiny, text="M", textcolor=color.black, offset=divPlotOffset)
+plotshape(i_showRsiDiv and bullDivRsi, title="Bull RSI div", style=shape.circle, location=location.belowbar,
+     color=color.new(color.green, 30), size=size.tiny, text="R", textcolor=color.black, offset=divPlotOffset)
+plotshape(i_showRsiDiv and bearDivRsi, title="Bear RSI div", style=shape.circle, location=location.abovebar,
+     color=color.new(color.red, 30), size=size.tiny, text="R", textcolor=color.black, offset=divPlotOffset)
+
+plotshape(execLong, title="MUA long", style=shape.labelup, location=location.belowbar,
+     color=color.new(color.teal, 0), size=size.small, text="MUA", textcolor=color.white)
+plotshape(execShort, title="SHORT", style=shape.labeldown, location=location.abovebar,
+     color=color.new(color.purple, 0), size=size.small, text="SHORT", textcolor=color.white)
+
+devPct = (not na(ma200) and ma200 != 0.0) ? (close - ma200) / ma200 * 100.0 : na
+
+var label lastInfoLbl = na
+if i_showLastLabel and barstate.islast
+    devStr = na(devPct) ? "—" : str.tostring(devPct, "#.##") + "%"
+    neStr = "OFF"
+    neColor = color.new(color.red, 0)
+    if neutralMode
+        neStr := "ON"
+        neColor := color.new(color.lime, 0)
+    txt = "MA200: " + str.tostring(ma200, "#.##")
+    txt := txt + "\nDev: " + devStr
+    txt := txt + "\nNeutral: " + neStr + " (" + str.tostring(neutralScore, "#.0") + ")"
+
+    if na(lastInfoLbl)
+        lastInfoLbl := label.new(bar_index, high, txt, style=label.style_label_down, textcolor=color.white, color=neColor, size=size.small)
+    else
+        label.set_xy(lastInfoLbl, bar_index, high)
+        label.set_text(lastInfoLbl, txt)
+        label.set_color(lastInfoLbl, neColor)
