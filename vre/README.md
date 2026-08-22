@@ -1,5 +1,7 @@
 # VRE — Vietnam Real Estate & Economic Dashboard
 
+**Repo:** `stock/` (đã tách khỏi Trading-bot).
+
 Interactive dashboard analyzing Vietnam real estate prices alongside global macro indicators.
 
 **Giao diện:** Tiếng Việt — có mục *«Hướng dẫn đọc nhanh»* trong app để người không chuyên theo dõi chỉ số.
@@ -26,7 +28,7 @@ pip install -r requirements.txt
 export FRED_API_KEY="your_key_here"
 
 # 3. Run dashboard
-streamlit run vre/app.py
+cd stock && streamlit run vre/app.py
 # Open http://localhost:8501
 ```
 
