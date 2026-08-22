@@ -194,7 +194,7 @@ def _screen_interval(symbol: str, interval: str) -> Optional[TradeIdea]:
             take_profit=float(snap["tp"]) if snap.get("tp") is not None else close * 1.10,
             rsi=float(rsi[i]),
             hist=float(hist[i]),
-            reason="MACD hist cross↑0 + RSI<OB + EMA bull",
+            reason="MACD hist cross up 0 + RSI below OB + EMA bull",
             bar_time=bar_t,
         )
 
@@ -251,24 +251,41 @@ def _save_sent(keys: set) -> None:
     )
 
 
+def _escape_html(text: str) -> str:
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
 def _dedupe_key(idea: TradeIdea, day: str) -> str:
     return f"{day}|{idea.symbol}|{idea.interval}|{idea.tier}|{idea.side}"
 
 
 def format_telegram(ideas: List[TradeIdea], now: datetime) -> str:
     lines = [
-        f"<b>VN HOURLY</b> {now.strftime('%a %Y-%m-%d %H:%M')} ICT",
+        f"<b>VN HOURLY</b> {_escape_html(now.strftime('%a %Y-%m-%d %H:%M'))} ICT",
         f"Signals: <b>{len(ideas)}</b>",
         "",
     ]
     for idea in ideas:
         lines.append(
-            f"<b>{idea.symbol}</b> {idea.interval} · {idea.tier.upper()} LONG"
+            f"<b>{_escape_html(idea.symbol)}</b> {_escape_html(idea.interval)} · "
+            f"{_escape_html(idea.tier.upper())} LONG"
         )
-        lines.append(f"Close <code>{idea.close:.2f}</code> | RSI {idea.rsi:.1f}" if idea.rsi is not None else f"Close <code>{idea.close:.2f}</code>")
-        if idea.stop_loss is not None:
-            lines.append(f"SL <code>{idea.stop_loss:.2f}</code> · TP <code>{idea.take_profit:.2f}</code>")
-        lines.append(f"<i>{idea.reason}</i>")
+        if idea.rsi is not None:
+            lines.append(
+                f"Close <code>{idea.close:.2f}</code> | RSI {_escape_html(f'{idea.rsi:.1f}')}"
+            )
+        else:
+            lines.append(f"Close <code>{idea.close:.2f}</code>")
+        if idea.stop_loss is not None and idea.take_profit is not None:
+            lines.append(
+                f"SL <code>{idea.stop_loss:.2f}</code> · TP <code>{idea.take_profit:.2f}</code>"
+            )
+        lines.append(f"<i>{_escape_html(idea.reason)}</i>")
         lines.append("")
     lines.append("<i>Không phải lời khuyên đầu tư.</i>")
     return "\n".join(lines)
@@ -355,11 +372,14 @@ def main() -> int:
                 sent_cache.add(_dedupe_key(x, day))
             _save_sent(sent_cache)
         else:
+            # Không fail cả job — vẫn để bước commit CSV chạy được
             print(f"Telegram fail: {err}", file=sys.stderr)
-            return 1
+            return 0
     elif args.heartbeat:
         ok, err = send_message(format_heartbeat(now, len(symbols), 0))
         print("Heartbeat sent" if ok else f"Heartbeat fail: {err}")
+        if not ok:
+            return 0
     else:
         print("Không có tín hiệu mới — không gửi Telegram.")
 

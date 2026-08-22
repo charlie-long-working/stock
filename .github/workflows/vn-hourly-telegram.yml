@@ -97,7 +97,7 @@ jobs:
           python -m vn_stock.scripts.run_hourly_vn_session --delay 3.5 $EXTRA
 
       - name: Commit OHLCV CSV + snapshot into repo
-        if: ${{ github.event_name == 'schedule' || github.event.inputs.commit_data != 'false' }}
+        if: ${{ !cancelled() && (github.event_name == 'schedule' || github.event.inputs.commit_data != 'false') }}
         working-directory: stock
         run: |
           git config user.name "github-actions[bot]"
