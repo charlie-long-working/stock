@@ -7,7 +7,8 @@ Không gọi API giá: đọc kho giá đã điều chỉnh cổ tức `vn_stock
 Stock Intelligence cập nhật; chờ tối đa --wait-min phút nếu lần quét hôm nay chưa xong.
 
 1D — chỉ lệnh MUA (tài khoản thường không bán khống), T+2:
-  - macd_rsi_atr : MACD hist cắt lên 0 + RSI<70; SL 1,5×ATR, TP 2,5×ATR (backtest VN30 tốt nhất toàn mẫu)
+  - macd_rsi_atr : MACD hist cắt lên 0 + RSI<70; SL 1,5×ATR, TP 2,5×ATR. Backtest ngoài mẫu 2024+ sau phí lỗ
+                   (PF 0,78) → kết luận "off" trong setups/config.json → chỉ vào danh sách THEO DÕI (từ 15/11/2026)
   - macd_signed  : MACD+ cross/tiếp diễn/đảo chiều, SL swing+ATR, TP 2R (bản long-only)
   Lọc thanh khoản: GTGD TB 20 phiên ≥ --min-value-bn tỷ. Kèm điểm/khuyến nghị Stock Intelligence,
   cờ EMA20/50, chế độ thị trường, xu hướng tuần.
@@ -240,12 +241,12 @@ def weekly_block(week_end: str, idx_rows: List[Tuple[str, Optional[dict]]],
 def watch_block(date: str, items: List[Tuple[str, dict]], live_cfg: dict) -> str:
     lines = [f"👀 <b>Theo dõi — chưa đạt kiểm chứng</b> {h(date)}"]
     for sym, it in items:
-        lines.append(f"• <b>{h(sym)}</b> {h(LIVE.NAMES.get(it['setup'], it['setup']))}: {h(it['note'])}")
+        lines.append(f"• <b>{h(sym)}</b> {h(LIVE.display_name(it['setup']))}: {h(it['note'])}")
     ev = {it["setup"] for _, it in items}
     for s in sorted(ev):
         e = LIVE.evidence(s, live_cfg)
         if e:
-            lines.append(f"<i>{h(LIVE.NAMES.get(s, s))} — {h(e)}</i>")
+            lines.append(f"<i>{h(LIVE.display_name(s))} — {h(e)}</i>")
     lines.append("<i>Không có mức giá vào lệnh và không vào sổ lệnh vì backtest ngoài mẫu chưa đạt ngưỡng.</i>")
     return "\n".join(lines)
 
@@ -333,6 +334,16 @@ def main() -> int:
                                        "T+2: mua hôm nay, sớm nhất bán chiều T+2"] if n],
                     unit="nghìn đ"))
                 sigs[-1]._base_low = it.get("base_low")
+        # Chiến lược có kết luận backtest khác "ship" (vd macd_rsi_atr = off) → chỉ THEO DÕI, không gửi lệnh MUA
+        keep = []
+        for s in sigs:
+            v = LIVE.verdict(s.strategy, live_cfg)
+            if v is not None and v != "ship" and s.strategy in LIVE.LEGACY_NAMES:
+                watch_items.append((sym, {"setup": s.strategy, "note": s.rule.split(";")[0]}))  # bỏ phần SL/TP
+                print(f"  WATCH {s.strategy} {sym} {s.bar_time} (verdict {v})")
+            else:
+                keep.append(s)
+        sigs = keep
         for s in sigs:
             tp = f"{s.target:.2f}" if s.target is not None else "trailing"
             print(f"  SIGNAL {s.strategy} {sym} {s.bar_time} entry={s.entry:.2f} SL={s.stop:.2f} TP={tp}")

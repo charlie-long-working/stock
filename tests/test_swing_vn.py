@@ -185,5 +185,25 @@ class MainTests(unittest.TestCase):
         self.assertIn("Mua chủ động ròng: 1p +50%", text)
 
 
+    def test_legacy_strategy_off_is_watch_only(self):
+        live = {"macd_rsi_atr": {"verdict": "off", "evidence": "ngoài mẫu PF 0,78",
+                                 "config": {"exit": {"mode": "A"}}}}
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only", "--heartbeat"], live=live)
+        text = "\n".join(c[0][0] for c in send.call_args_list)
+        self.assertNotIn("🟢 LONG", text)
+        self.assertIn("Theo dõi — chưa đạt kiểm chứng", text)
+        self.assertIn("MACD+RSI (ATR)", text)
+        self.assertIn("ngoài mẫu PF 0,78", text)
+        self.assertIn("không có tín hiệu MUA", text)
+        led = json.loads((self.tmp / "ledger.json").read_text())
+        self.assertEqual(led["positions"], [])
+        live["macd_rsi_atr"]["verdict"] = "ship"
+        send.reset_mock()
+        (self.tmp / "sent.json").unlink()
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], live=live)
+        self.assertIn("🟢 LONG", send.call_args[0][0])
+
+
 if __name__ == "__main__":
     unittest.main()
