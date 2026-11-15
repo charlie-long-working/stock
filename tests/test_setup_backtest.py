@@ -181,5 +181,18 @@ class MacdSignedCausalityTests(unittest.TestCase):
         self.assertGreater(checked, 3)
 
 
+class MonthlySummaryTests(unittest.TestCase):
+    def test_summary_flags_changes_and_escapes(self):
+        from vn_stock.scripts import run_setup_backtest as R
+        new = {"base_breakout": {"verdict": "ship", "evidence": "PF 1,3 <ok>"},
+               "macd_signed": {"verdict": "off", "evidence": "PF 0,72"}}
+        msg = R.summary_message({"base_breakout": "watch", "macd_signed": "off"}, new, "BACKTEST_SETUPS_x.md", 97)
+        self.assertIn("SHIP (trước: WATCH)", msg)
+        self.assertIn("Có thay đổi kết luận", msg)
+        self.assertIn("PF 1,3 &lt;ok&gt;", msg)
+        same = R.summary_message({"base_breakout": "ship", "macd_signed": "off"}, new, "x.md", 97)
+        self.assertIn("Không đổi kết luận", same)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -54,6 +54,7 @@ def main() -> int:
     ap.add_argument("--symbols")
     ap.add_argument("--no-report", action="store_true", help="không ghi docs/ và setups/config.json")
     ap.add_argument("--random-iter", type=int, default=500)
+    ap.add_argument("--notify", action="store_true", help="gửi tóm tắt kết luận (và thay đổi) lên Telegram")
     args = ap.parse_args()
 
     t0 = time.time()
@@ -133,10 +134,48 @@ def main() -> int:
     live = {"frozen_at": summary["generated_at"], "source": f"data/research/setups_{stamp}",
             "setups": {s: {"verdict": g["verdict"], "config": g["config"], "evidence": evidence_text(g)}
                        for s, g in verdicts.items()}}
+    prev = previous_verdicts()
     CONFIG_PATH.write_text(json.dumps(live, ensure_ascii=False, indent=1), encoding="utf-8")
-    write_report(verdicts, summary, results, configs, DOCS / f"BACKTEST_SETUPS_{datetime.now():%Y-%m-%d}.md")
+    report = DOCS / f"BACKTEST_SETUPS_{datetime.now():%Y-%m-%d}.md"
+    write_report(verdicts, summary, results, configs, report)
     print(f"Đã ghi {CONFIG_PATH.relative_to(STOCK_ROOT)} và báo cáo docs/")
+    if args.notify:
+        from vn_stock.notify.telegram import send_message
+
+        ok, err = send_message(summary_message(prev, live["setups"], report.name, len(data)))
+        print("Telegram:", "OK" if ok else f"lỗi {err}")
+        return 0 if ok else 1
     return 0
+
+
+def previous_verdicts(path: Path = CONFIG_PATH) -> dict:
+    try:
+        return {k: v.get("verdict") for k, v in json.loads(path.read_text(encoding="utf-8")).get("setups", {}).items()}
+    except (OSError, ValueError):
+        return {}
+
+
+def summary_message(prev: dict, new: dict, report_name: str, n_symbols: int) -> str:
+    """Tóm tắt kết luận hằng tháng; nêu rõ chiến lược nào ĐỔI kết luận (vd off → ship = bot bắt đầu gửi lệnh MUA)."""
+    import html
+
+    icon = {"ship": "🟢", "watch": "👀", "off": "⚪️"}
+    lines = [f"🧪 <b>Backtest setup cổ phiếu VN — {datetime.now():%d/%m/%Y}</b> ({n_symbols} mã, ngoài mẫu 2024+)"]
+    changed = []
+    for setup, info in new.items():
+        v, old = info["verdict"], prev.get(setup)
+        tag = ""
+        if old and old != v:
+            tag = f" (trước: {old.upper()})"
+            changed.append(setup)
+        lines.append(f"{icon.get(v, '•')} <b>{html.escape(NAMES.get(setup, setup))}</b>: {v.upper()}{html.escape(tag)}")
+        lines.append(f"   <i>{html.escape(info.get('evidence', ''))}</i>")
+    if changed:
+        lines.append("⚠️ Có thay đổi kết luận — bot tự áp dụng từ phiên kế tiếp (SHIP = gửi lệnh MUA, còn lại = theo dõi).")
+    else:
+        lines.append("Không đổi kết luận so với lần trước.")
+    lines.append(f"<i>Báo cáo: stock/docs/{html.escape(report_name)}. Không phải lời khuyên đầu tư.</i>")
+    return "\n".join(lines)
 
 
 def _pct(x):

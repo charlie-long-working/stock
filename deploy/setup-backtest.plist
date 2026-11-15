@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<key>PYTHONPATH</key>
+		<string>/Users/namnguyen/Documents/Cursor/stock:/Users/namnguyen/Documents/Cursor/Trading-bot</string>
+		<key>PYTHONUNBUFFERED</key>
+		<string>1</string>
+		<key>TZ</key>
+		<string>Asia/Ho_Chi_Minh</string>
+	</dict>
+	<key>Label</key>
+	<string>com.cursor.vn-setup-backtest</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/namnguyen/Documents/Cursor/stock/.venv/bin/python</string>
+		<string>-W</string>
+		<string>ignore</string>
+		<string>-m</string>
+		<string>vn_stock.scripts.run_setup_backtest</string>
+		<string>--notify</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/namnguyen/Library/Logs/swing/setup-backtest.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/namnguyen/Library/Logs/swing/setup-backtest.log</string>
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict>
+			<key>Day</key>
+			<integer>1</integer>
+			<key>Hour</key>
+			<integer>17</integer>
+			<key>Minute</key>
+			<integer>30</integer>
+		</dict>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/namnguyen/Documents/Cursor/stock</string>
+</dict>
+</plist>

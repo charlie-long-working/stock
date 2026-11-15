@@ -94,7 +94,7 @@ Offline (dữ liệu giả, mock mạng/Telegram): `tests/test_vn_news.py`, `tes
 | Phần | Lệnh | Ghi chú |
 |------|------|---------|
 | Thu thập mua/bán chủ động | `$PY -m vn_stock.scripts.run_tape_collect [--symbols VCB,HPG] [--dry-run]` | Tự chạy trong job 16:00; dữ liệu `vn_stock/data/tape/` (gitignored) |
-| Backtest setup + ngưỡng | `$PY -m vn_stock.scripts.run_setup_backtest` | ~80 giây; ghi `vn_stock/setups/config.json` + `docs/BACKTEST_SETUPS_<ngày>.md` |
+| Backtest setup + ngưỡng | `$PY -m vn_stock.scripts.run_setup_backtest [--notify]` | ~90 giây; ghi `vn_stock/setups/config.json` + `docs/BACKTEST_SETUPS_<ngày>.md`. Tự chạy ngày 1 hằng tháng 17:30 (launchd `com.cursor.vn-setup-backtest`) và báo Telegram |
 | Bot | `run_swing_vn` | BÁN/THOÁT từ sổ lệnh giấy → MUA (kèm % vốn tối đa, mua chủ động ròng) → THEO DÕI → top 10 dòng tiền → bản tin tuần |
 
 Kết quả backtest ngoài mẫu 2024+ (sau phí, T+2): xem `docs/BACKTEST_SETUPS_2026-11-15.md`. Chưa setup nào đạt ngưỡng để thành lệnh MUA; phá nền chỉ ở dạng THEO DÕI.
