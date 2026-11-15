@@ -29,6 +29,7 @@ from vn_stock.setups import features as F
 from vn_stock.setups.exits import ExitParams, Position, init_target, step
 from vn_stock.setups.sizing import CAP_PER_NAME, MAX_POSITIONS, RISK_PER_TRADE
 from vn_stock.strategies.macd_rsi import MACDRSIParams, precompute_macd_rsi
+from vn_stock.strategies.macd_signed import MacdSignedParams, idea_at, precompute_macd_signed
 
 DEFAULT_COSTS = {"fee_buy": 0.0015, "fee_sell": 0.0015, "tax_sell": 0.001, "slippage": 0.001}
 TRAIN_END = "2022-01-01"
@@ -48,7 +49,7 @@ def load_costs() -> Dict[str, float]:
 
 @dataclass(frozen=True)
 class Config:
-    setup: str                      # base_breakout | div_bull | macd_rsi_atr
+    setup: str                      # base_breakout | div_bull | macd_rsi_atr | macd_signed
     params: Tuple[Tuple[str, object], ...]
     exit: ExitParams
     regime_filter: bool = False
@@ -77,7 +78,8 @@ def signals(cfg: Config, df: pd.DataFrame, feats: pd.DataFrame) -> pd.DataFrame:
     out = pd.DataFrame(index=df.index)
     out["base_low"] = np.nan
     out["bear_div"] = False
-    out["signal_exit"] = False
+    if cfg.setup != "macd_signed":
+        out["signal_exit"] = False
     if cfg.setup == "base_breakout":
         b = B.detect(df, B.BaseParams(**prm), feats=feats)
         out["entry"], out["stop"], out["rvol"], out["base_low"] = b["breakout"], b["stop"], b["rvol50"], b["base_low"]
@@ -96,10 +98,37 @@ def signals(cfg: Config, df: pd.DataFrame, feats: pd.DataFrame) -> pd.DataFrame:
         out["stop"] = cl - mp.atr_sl_mult * atr_arr
         out["rvol"] = feats["rvol50"]
         out["signal_exit"] = (prev >= 0) & (hist < 0)
+    elif cfg.setup == "macd_signed":
+        out = out.join(macd_signed_frame(df, MacdSignedParams(**prm) if prm else MacdSignedParams(allow_short=False)))
+        out["entry"] &= (feats["value_avg20_bn"] >= 10).fillna(False).to_numpy()
+        out["rvol"] = feats["rvol50"]
     else:
         raise ValueError(cfg.setup)
     out["entry"] = out["entry"].fillna(False).astype(bool)
     return out
+
+
+def macd_signed_frame(df: pd.DataFrame, p: MacdSignedParams, warmup: int = 260) -> pd.DataFrame:
+    """Tín hiệu MUA macd_signed như bot live, NHÂN QUẢ: đỉnh/đáy swing chỉ dùng khi đã đủ `swing_right` nến xác nhận
+    (precompute trên cả chuỗi sẽ lộ đỉnh/đáy nến i−1 trước khi có nến i+1). Chỉ báo khi setup mới (khác nến trước)."""
+    hi, lo, cl = (df[c].to_numpy(float) for c in ("high", "low", "close"))
+    n = len(cl)
+    hist, rsi, atr, ema_f, ema_tf, ema_ts, sh, sl = precompute_macd_signed(hi, lo, cl, p)
+    entry = np.zeros(n, bool)
+    stop = np.full(n, np.nan)
+    target = np.full(n, np.nan)
+    prev = None
+    for i in range(max(2, warmup - 1), n):
+        k = i - p.swing_right
+        arr = (hist, rsi, atr, ema_f, ema_tf, ema_ts, sh[sh <= k], sl[sl <= k])
+        idea = idea_at(hi, lo, cl, i, arrays=arr, params=p)
+        fresh = idea is not None and (prev is None or (prev.setup, prev.side) != (idea.setup, idea.side))
+        if i >= warmup and fresh and idea.side == "long":
+            entry[i], stop[i], target[i] = True, idea.stop_loss, idea.take_profit
+        prev = idea
+    prev_h = np.r_[np.nan, hist[:-1]]
+    return pd.DataFrame({"entry": entry, "stop": stop, "target": target,
+                         "signal_exit": (prev_h >= 0) & (hist < 0)}, index=df.index)
 
 
 # ---------------------------------------------------------------- simulate
@@ -116,6 +145,7 @@ def simulate_symbol(sym: str, df: pd.DataFrame, sig: pd.DataFrame, cfg: Config, 
     entry = sig["entry"].to_numpy()
     stop_arr, rvol = sig["stop"].to_numpy(float), sig["rvol"].to_numpy(float)
     base_low, bear, sx = sig["base_low"].to_numpy(float), sig["bear_div"].to_numpy(bool), sig["signal_exit"].to_numpy(bool)
+    tgt = sig["target"].to_numpy(float) if "target" in sig.columns else np.full(n, np.nan)
     atr = F.atr(df).to_numpy(float)
     prev_c = np.r_[np.nan, c[:-1]]
     jump = (np.abs(c / prev_c - 1) > CA_JUMP) | (np.abs(o / prev_c - 1) > CA_JUMP)
@@ -140,7 +170,8 @@ def simulate_symbol(sym: str, df: pd.DataFrame, sig: pd.DataFrame, cfg: Config, 
         stop = stop_arr[t]
         if not np.isfinite(stop) or stop >= entry_px:
             continue
-        pos = init_target(Position(sym, cfg.setup, t + 1, entry_px, float(stop), float(atr[t])), cfg.exit)
+        pos = init_target(Position(sym, cfg.setup, t + 1, entry_px, float(stop), float(atr[t]),
+                                   target=float(tgt[t]) if np.isfinite(tgt[t]) else None), cfg.exit)
         ev = None
         for i in range(t + 1, n):
             flags = {"breakdown": bool(np.isfinite(base_low[t]) and c[i] < base_low[t] * 0.995),
@@ -336,6 +367,9 @@ def grid() -> List[Config]:
 
 BENCHMARK = Config("macd_rsi_atr", (), ExitParams(mode="A", tp_r=2.5 / 1.5, time_stop=60, use_breakdown=False,
                                                    use_signal_exit=True), False)
+# macd_signed như bot live: chỉ MUA, SL swing+ATR, TP 2R (tuyệt đối từ tín hiệu), thoát khi hist MACD cắt xuống 0
+BENCHMARK_SIGNED = Config("macd_signed", (("allow_short", False),),
+                          ExitParams(mode="A", time_stop=30, use_breakdown=False, use_signal_exit=True), False)
 
 
 def run_config(cfg: Config, data: Dict[str, pd.DataFrame], feats: Dict[str, pd.DataFrame], costs: Dict[str, float],

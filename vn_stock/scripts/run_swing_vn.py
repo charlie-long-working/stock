@@ -74,7 +74,8 @@ INDICES = ["VNINDEX", "VN30", "HNXINDEX"]
 EVIDENCE = {
     "macd_rsi_atr": "ngoài mẫu 2024+ (97 mã, sau phí, T+2): 2.235 lệnh, win 33%, PF 0,78, TB −0,63%/lệnh — "
                     "CHƯA có lợi thế (docs/BACKTEST_SETUPS_2026-11-15.md)",
-    "macd_signed": "VN30: PF trung vị 1,37 (bản có short); bản chỉ MUA chưa backtest riêng",
+    "macd_signed": "ngoài mẫu 2024+ (97 mã, sau phí, T+2, chỉ MUA): 1.344 lệnh, win 30%, PF 0,72, TB −0,80%/lệnh — "
+                   "CHƯA có lợi thế (docs/BACKTEST_SETUPS_2026-11-15.md)",
 }
 
 

@@ -10,7 +10,8 @@
 |---|---|---|---|---|
 | Phá nền giá đi ngang | **WATCH** | 139 lệnh, win 31%, PF 1.049, TB +0.16% | 120 lệnh, PF 1.914, TB +2.58% | 0.838 |
 | Phân kỳ dương MACD/RSI | **OFF** | 109 lệnh, win 25%, PF 0.739, TB -0.90% | 80 lệnh, PF 1.179, TB +0.59% | 0.071 |
-| MACD+RSI ATR (đang chạy live) | **OFF** | 2235 lệnh, win 33%, PF 0.78, TB -0.63% | 1961 lệnh, PF 1.105, TB +0.27% | 0.947 |
+| MACD+RSI ATR (đã hạ xuống theo dõi) | **OFF** | 2235 lệnh, win 33%, PF 0.78, TB -0.63% | 1961 lệnh, PF 1.105, TB +0.27% | 0.947 |
+| MACD signed — chỉ MUA (đang chạy live) | **OFF** | 1344 lệnh, win 30%, PF 0.724, TB -0.80% | 1657 lệnh, PF 1.39, TB +0.92% | 0.631 |
 
 SHIP = gửi lệnh MUA có entry/SL/TP và vào sổ lệnh; WATCH = chỉ danh sách theo dõi; OFF = không gửi.
 
@@ -66,7 +67,7 @@ Cấu hình (`div_bull-c21306f7`, chọn bằng dự phòng: không cấu hình 
 - Tập trung: mã lớn nhất None tổng lãi, PF bỏ top 3: 0.389
 - Theo năm (TB/lệnh): {'2024': -0.00999, '2025': -0.00088, '2026': -0.02083}
 
-## MACD+RSI ATR (đang chạy live)
+## MACD+RSI ATR (đã hạ xuống theo dõi)
 
 Cấu hình (`macd_rsi_atr-292a6b8e`, chọn bằng đối chứng — cấu hình đang chạy live):
 ```json
@@ -91,6 +92,32 @@ Cấu hình (`macd_rsi_atr-292a6b8e`, chọn bằng đối chứng — cấu hì
 - Danh mục (≤5 vị thế, 1% rủi ro): 407 lệnh nhận, CAGR -23.80%, max DD -54.90%
 - Tập trung: mã lớn nhất None tổng lãi, PF bỏ top 3: 0.758
 - Theo năm (TB/lệnh): {'2024': -0.00839, '2025': -0.00053, '2026': -0.0101}
+
+## MACD signed — chỉ MUA (đang chạy live)
+
+Cấu hình (`macd_signed-4198415f`, chọn bằng đối chứng — cấu hình đang chạy live):
+```json
+{"id": "macd_signed-4198415f", "setup": "macd_signed", "params": {"allow_short": false}, "exit": {"mode": "A", "tp_r": 2.0, "time_stop": 30, "be_r": 1.0, "trail_atr": 3.0, "use_breakdown": false, "use_bear_div": false, "use_signal_exit": true}, "regime_filter": false}
+```
+
+| Ngưỡng | Đạt |
+|---|---|
+| trades>=60 | ✓ |
+| accepted>=40 | ✓ |
+| pf>=1.2 | ✗ |
+| bootstrap_lb>0 | ✗ |
+| beats_random_p90 | ✗ |
+| pf_ex_top3>=1 | ✗ |
+| symbol_share<=25% | ✗ |
+| validate_pf>=1 | ✗ |
+| oos_years_positive>=2 | ✗ |
+| portfolio_dd<=20% | ✗ |
+| pf_2x_costs>=1.05 | ✗ |
+
+- Bootstrap cận dưới 97,5% TB/lệnh: -1.40% · random p90: +0.29%
+- Danh mục (≤5 vị thế, 1% rủi ro): 396 lệnh nhận, CAGR -16.61%, max DD -42.60%
+- Tập trung: mã lớn nhất None tổng lãi, PF bỏ top 3: 0.687
+- Theo năm (TB/lệnh): {'2024': -0.00912, '2025': -0.00041, '2026': -0.01973}
 
 ## Toàn bộ lưới (train / validate)
 
@@ -121,5 +148,6 @@ Cấu hình (`macd_rsi_atr-292a6b8e`, chọn bằng đối chứng — cấu hì
 | `div_bull-e69436d7` | 47 | 0.719 | -0.79% | 32 | 0.541 |
 | `div_bull-f02b8632` | 47 | 0.617 | -1.17% | 32 | 0.822 |
 | `macd_rsi_atr-292a6b8e` | 1961 | 1.105 | +0.27% | 1405 | 0.947 |
+| `macd_signed-4198415f` | 1657 | 1.39 | +0.92% | 898 | 0.631 |
 
 Không phải lời khuyên đầu tư.

@@ -24,6 +24,7 @@ from vn_stock.strategies.macd_rsi import precompute_macd_rsi
 CONFIG = Path(__file__).resolve().parent / "config.json"
 NAMES = {"base_breakout": "Phá nền giá đi ngang", "div_bull": "Phân kỳ dương MACD/RSI"}
 # Chiến lược cũ (đã chạy live trước khi có backtest); kết luận cũng đọc từ config.json
+# Chiến lược có trong dict này sẽ bị chuyển sang THEO DÕI khi kết luận ≠ ship (người dùng đã duyệt từng chiến lược)
 LEGACY_NAMES = {"macd_rsi_atr": "MACD+RSI (ATR)"}
 
 

@@ -34,7 +34,7 @@ REASON_VI = {"SL": "chạm cắt lỗ", "TP": "chạm chốt lời", "trail": "t
 # Thoát cho các chiến lược đang chạy (setup mới lấy từ setups/config.json)
 STRATEGY_EXITS = {
     "macd_rsi_atr": ExitParams(mode="A", tp_r=2.5 / 1.5, time_stop=60, use_breakdown=False, use_signal_exit=True),
-    "macd_signed": ExitParams(mode="A", time_stop=30, use_breakdown=False),
+    "macd_signed": ExitParams(mode="A", time_stop=30, use_breakdown=False, use_signal_exit=True),
 }
 
 

@@ -150,5 +150,36 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(S.config_from_dict(a.to_dict()).id, a.id)
 
 
+class MacdSignedCausalityTests(unittest.TestCase):
+    """Backtest macd_signed phải ra ĐÚNG tín hiệu mà bot live tính trên dữ liệu cắt tới nến i
+    (precompute swing trên cả chuỗi sẽ lộ đỉnh/đáy trước khi được xác nhận)."""
+
+    def test_matches_live_on_prefix(self):
+        from vn_stock.strategies.macd_signed import MacdSignedParams, macd_signed_signal
+
+        rng = np.random.default_rng(21)
+        n = 420
+        c = 50 * np.exp(np.cumsum(rng.normal(0.0005, 0.018, n)))
+        o = np.r_[c[0], c[:-1]]
+        df = pd.DataFrame({"time": pd.bdate_range("2020-01-01", periods=n), "open": o,
+                           "high": np.maximum(o, c) * 1.01, "low": np.minimum(o, c) * 0.99, "close": c,
+                           "volume": 1e6})
+        p = MacdSignedParams(allow_short=False)
+        fr = S.macd_signed_frame(df, p, warmup=60)
+        hi, lo, cl = (df[k].to_numpy() for k in ("high", "low", "close"))
+        checked = 0
+        for i in range(61, n):
+            idea = macd_signed_signal(hi[: i + 1], lo[: i + 1], cl[: i + 1], p)
+            prev = macd_signed_signal(hi[:i], lo[:i], cl[:i], p)
+            fresh = idea is not None and idea.side == "long" and (
+                prev is None or (prev.setup, prev.side) != (idea.setup, idea.side))
+            self.assertEqual(bool(fr["entry"].iloc[i]), fresh, i)
+            if fresh:
+                self.assertAlmostEqual(fr["stop"].iloc[i], idea.stop_loss, places=9)
+                self.assertAlmostEqual(fr["target"].iloc[i], idea.take_profit, places=9)
+                checked += 1
+        self.assertGreater(checked, 3)
+
+
 if __name__ == "__main__":
     unittest.main()

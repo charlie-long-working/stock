@@ -1,6 +1,6 @@
 {
- "frozen_at": "2026-11-15T22:10:46",
- "source": "data/research/setups_20261115_2210",
+ "frozen_at": "2026-11-15T22:24:04",
+ "source": "data/research/setups_20261115_2224",
  "setups": {
   "base_breakout": {
    "verdict": "watch",
@@ -84,6 +84,28 @@
     "regime_filter": false
    },
    "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 2235 lệnh, win 33%, PF 0.78, TB -0.63%/lệnh — OFF"
+  },
+  "macd_signed": {
+   "verdict": "off",
+   "config": {
+    "id": "macd_signed-4198415f",
+    "setup": "macd_signed",
+    "params": {
+     "allow_short": false
+    },
+    "exit": {
+     "mode": "A",
+     "tp_r": 2.0,
+     "time_stop": 30,
+     "be_r": 1.0,
+     "trail_atr": 3.0,
+     "use_breakdown": false,
+     "use_bear_div": false,
+     "use_signal_exit": true
+    },
+    "regime_filter": false
+   },
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 1344 lệnh, win 30%, PF 0.72, TB -0.80%/lệnh — OFF"
   }
  }
 }
