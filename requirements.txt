@@ -1,0 +1,7 @@
+# daily-brief không có venv riêng: chạy bằng ../stock/.venv/bin/python (Python 3.13).
+# Code bot dùng thư viện chuẩn (tomllib, sqlite3, urllib). Phần giá cần các gói của stock/.venv
+# và import module anh em: ../stock (vn_stock) và ../precious-metals (precious).
+# Lưu ý: vnstock đã bị gỡ khỏi PyPI — không cài lại được bằng pip.
+vnstock==3.5.0
+yfinance
+pandas

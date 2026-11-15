@@ -1,0 +1,61 @@
+# Cấu hình daily-brief. Không chứa secret.
+
+[telegram]
+# Token/chat ID đọc từ các file .env sau (theo thứ tự, file sau không ghi đè biến đã có).
+# BRIEF_TELEGRAM_BOT_TOKEN / BRIEF_TELEGRAM_CHAT_ID (nếu có) được ưu tiên hơn TELEGRAM_*.
+env_files = [".env", "../Trading-bot/.env", "../stock/.env", "../precious-metals/.env"]
+# Chỉ trả lời chat này (chat riêng). Lệnh từ chat khác bị bỏ qua.
+poll_timeout_s = 50
+# Lệnh cũ hơn số phút này (vd. gửi lúc máy ngủ / bot tắt) bị bỏ qua.
+ignore_older_min = 15
+
+[brief]
+window_hours = 24          # cửa sổ tin khi chưa có bản trước hoặc dùng /brief full
+max_items = 12
+summary_chars = 220
+dedup_jaccard = 0.5
+# số mục tối đa mỗi phần
+caps = { vn_politics = 3, vn_economy = 3, world = 3, stock = 2, gold = 1 }
+
+[schedule]
+# Tự gửi theo giờ VN. Chỉ chạy khi bot đang chạy (máy thức).
+# Lỡ mốc (máy ngủ/bot tắt) -> gửi bù khi bot chạy lại, ghi rõ "gửi bù"; quá skip_after thì bỏ, bản sau bao phủ.
+# parts: news (tin, có dòng số liệu tóm tắt) | stock (chỉ gửi khi hôm nay có phiên) | gold (vàng + tỷ giá)
+enabled = true
+late_after_min = 20   # gửi sau mốc quá số phút này thì ghi "gửi bù"
+retry_min = 10        # lỗi (mạng, nguồn) thì thử lại sau số phút này
+max_attempts = 3
+slots = [
+  { name = "morning", label = "sáng", at = "08:15", skip_after = "15:00", parts = ["news", "gold"] },
+  { name = "afternoon", label = "chiều", at = "16:30", skip_after = "23:00", parts = ["news", "stock", "gold"] },
+]
+
+[site]
+# Trang tĩnh site/index.html (tin, BTC/ETH, chứng khoán, vàng bạc). Dựng lại trong tiến trình bot sau các mốc dưới
+# (sau bản tin sáng; sau lần quét Stock Intelligence 15:30). Lỡ mốc vì máy ngủ → dựng khi thức, trước mốc kế tiếp.
+enabled = true
+rebuild_at = ["08:25", "16:45"]
+# Dựng xong → đẩy lên nhánh gh-pages của repo stock (public) → GitHub Actions deploy Pages (brief/publish.py).
+publish = true
+publish_remote = "git@github-charlie:charlie-long-working/stock.git"
+publish_branch = "gh-pages"
+page_url = "https://charlie-long-working.github.io/stock/"
+# Trang phụ tĩnh đẩy kèm mỗi lần publish: "đường dẫn trên Pages" = "file HTML nguồn" (tương đối thư mục daily-brief).
+# Thiếu file nguồn → bỏ qua trang đó, không chặn bản tin.
+extra_pages = { "reports/m2-metals-oil" = "../precious-metals/outputs/m2-metals-oil-20261115/report.html" }
+
+[watchlist]
+# Tái sử dụng danh sách có sẵn trong repo stock (CHƯA được xác nhận là watchlist chính thức).
+file = "../stock/vn_stock/data/screening/watchlist_27_coverage.json"
+label = "watchlist_27 từ repo stock (chưa xác nhận)"
+
+[market]
+indices = ["VNINDEX", "VN30", "HNXINDEX"]
+cache_min = 10
+
+[ai]
+# Bot chỉ dùng AI khi bật và có lệnh `claude` (Claude Code CLI, đăng nhập bằng tài khoản của bạn).
+# Hiện tại: TẮT vì máy chưa cài Claude Code CLI trên PATH.
+enabled = false
+command = ["claude", "-p", "--model", "sonnet"]
+timeout_s = 300

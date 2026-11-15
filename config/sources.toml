@@ -1,0 +1,240 @@
+# Danh mục nguồn cho daily-brief.
+# kind:  press | official | aggregator | market
+# tier:  core (nguồn khởi đầu) | extended (mở rộng sau)
+# format: rss | vcb_xml | sjc_xml
+# Ghi chú: Reuters/AP không có RSS chính thức -> dùng Google News RSS (aggregator),
+# chỉ có tiêu đề + link. FT/Bloomberg: chỉ tiêu đề/standfirst, bài sau paywall.
+
+# ---------- Báo chí Việt Nam ----------
+[[source]]
+id = "vnexpress_thoisu"
+name = "VnExpress – Thời sự"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vnexpress.net/rss/thoi-su.rss"
+
+[[source]]
+id = "vnexpress_kinhdoanh"
+name = "VnExpress – Kinh doanh"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vnexpress.net/rss/kinh-doanh.rss"
+
+[[source]]
+id = "vnexpress_thegioi"
+name = "VnExpress – Thế giới"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vnexpress.net/rss/the-gioi.rss"
+
+[[source]]
+id = "baochinhphu"
+name = "Báo Điện tử Chính phủ"
+kind = "official"
+tier = "core"
+format = "rss"
+url = "https://baochinhphu.vn/rss"
+
+[[source]]
+id = "vneconomy_tinmoi"
+name = "VnEconomy – Tin mới"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vneconomy.vn/tin-moi.rss"
+
+[[source]]
+id = "vneconomy_chungkhoan"
+name = "VnEconomy – Chứng khoán"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vneconomy.vn/chung-khoan.rss"
+
+[[source]]
+id = "vneconomy_taichinh"
+name = "VnEconomy – Tài chính"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vneconomy.vn/tai-chinh.rss"
+
+# ---------- Báo tài chính bổ sung (RSS công khai, kiểm tra 15/11/2026: HTTP 200, 50 item) ----------
+[[source]]
+id = "cafef_chungkhoan"
+name = "CafeF – Thị trường chứng khoán"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://cafef.vn/thi-truong-chung-khoan.rss"
+
+[[source]]
+id = "cafef_taichinh"
+name = "CafeF – Tài chính ngân hàng"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://cafef.vn/tai-chinh-ngan-hang.rss"
+
+[[source]]
+id = "cafef_doanhnghiep"
+name = "CafeF – Doanh nghiệp"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://cafef.vn/doanh-nghiep.rss"
+
+[[source]]
+id = "tnck_chungkhoan"
+name = "Tin nhanh chứng khoán – Chứng khoán"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://www.tinnhanhchungkhoan.vn/rss/chung-khoan-1.rss"
+
+[[source]]
+id = "vneconomy_kinhtethegioi"
+name = "VnEconomy – Kinh tế thế giới"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vneconomy.vn/kinh-te-the-gioi.rss"
+
+[[source]]
+id = "vietstock_cophieu"
+enabled = false  # 403 ngày 2026-11-14; thay bằng gnews_vietstock
+name = "Vietstock – Cổ phiếu"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vietstock.vn/830/chung-khoan/co-phieu.rss"
+
+[[source]]
+id = "vietstock_vimo"
+enabled = false  # 403 ngày 2026-11-14; thay bằng gnews_vietstock
+name = "Vietstock – Vĩ mô"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vietstock.vn/761/kinh-te/vi-mo.rss"
+
+[[source]]
+id = "vietstock_vang"
+enabled = false  # 403 ngày 2026-11-14; thay bằng gnews_vietstock
+name = "Vietstock – Vàng và kim loại quý"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vietstock.vn/759/hang-hoa/vang-va-kim-loai-quy.rss"
+
+[[source]]
+id = "vietstock_nhandinh"
+enabled = false  # 403 ngày 2026-11-14; thay bằng gnews_vietstock
+name = "Vietstock – Nhận định thị trường"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vietstock.vn/1636/nhan-dinh-phan-tich/nhan-dinh-thi-truong.rss"
+
+# Dự phòng khi RSS Vietstock trả 403 (chỉ tiêu đề + link, qua Google News)
+[[source]]
+id = "gnews_vietstock"
+name = "Vietstock (qua Google News RSS)"
+kind = "aggregator"
+tier = "core"
+format = "rss"
+url = "https://news.google.com/rss/search?q=site:vietstock.vn+when:1d&hl=vi&gl=VN&ceid=VN:vi"
+
+# ---------- Quốc tế (qua trang tổng hợp) ----------
+[[source]]
+id = "gnews_reuters"
+name = "Reuters (qua Google News RSS)"
+kind = "aggregator"
+tier = "core"
+format = "rss"
+url = "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+
+[[source]]
+id = "gnews_apnews"
+name = "AP News (qua Google News RSS)"
+kind = "aggregator"
+tier = "core"
+format = "rss"
+url = "https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+
+# ---------- Mở rộng ----------
+[[source]]
+id = "tuoitre_thoisu"
+name = "Tuổi Trẻ – Thời sự"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://tuoitre.vn/rss/thoi-su.rss"
+
+[[source]]
+id = "tuoitre_kinhdoanh"
+name = "Tuổi Trẻ – Kinh doanh"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://tuoitre.vn/rss/kinh-doanh.rss"
+
+[[source]]
+id = "bbc_world"
+name = "BBC – World"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://feeds.bbci.co.uk/news/world/rss.xml"
+
+[[source]]
+id = "bbc_business"
+name = "BBC – Business"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://feeds.bbci.co.uk/news/business/rss.xml"
+
+[[source]]
+id = "bbc_vietnamese"
+name = "BBC Tiếng Việt"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://feeds.bbci.co.uk/vietnamese/rss.xml"
+
+[[source]]
+id = "ft_home"
+name = "Financial Times – Home (tiêu đề)"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://www.ft.com/rss/home"
+
+[[source]]
+id = "bloomberg_markets"
+name = "Bloomberg – Markets (feed không tài liệu hoá)"
+kind = "press"
+tier = "extended"
+format = "rss"
+url = "https://feeds.bloomberg.com/markets/news.rss"
+
+# ---------- Dữ liệu thị trường ----------
+[[source]]
+id = "vcb_fx"
+name = "Vietcombank – Tỷ giá (XML công khai)"
+kind = "market"
+tier = "core"
+format = "vcb_xml"
+url = "https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx"
+
+[[source]]
+id = "sjc_xml"
+name = "SJC – Giá vàng (XML, endpoint đang dùng ở precious-metals)"
+kind = "market"
+tier = "core"
+format = "sjc_xml"
+url = "https://sjc.com.vn/xml/tygiavang.xml"

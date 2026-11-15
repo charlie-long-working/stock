@@ -1,0 +1,18 @@
+# secrets & sessions
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+
+# runtime data (SQLite, logs, run outputs)
+var/
+runs/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.DS_Store
+site/
