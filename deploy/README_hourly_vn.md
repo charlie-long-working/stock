@@ -1,6 +1,8 @@
 # VN hourly trading session
 
-Mỗi giờ **T2–T6, 8:05–14:05** (ICT): cập nhật nến → quét tín hiệu → Telegram nếu có lệnh.
+Mỗi giờ **T2–T6, 8:05–14:05** (giờ VN): cập nhật nến 1H/1D (dựng 4H) → quét `macd_signed` (MACD+ long / MACD− short) → Telegram khi có ý tưởng mới trong ngày.
+
+**Đang chạy bằng launchd trên Mac** (`com.cursor.vn-hourly`). Workflow GitHub `vn-hourly-telegram.yml` đã tắt vì vnstock không còn trên PyPI — xem `GITHUB_ACTIONS_VN_HOURLY.md` (lưu trữ).
 
 ## Chạy thử ngay
 
@@ -8,49 +10,48 @@ Mỗi giờ **T2–T6, 8:05–14:05** (ICT): cập nhật nến → quét tín h
 cd /Users/namnguyen/Documents/Cursor/stock
 export PYTHONPATH="$PWD:$PWD/../Trading-bot"
 .venv/bin/python -m vn_stock.scripts.run_hourly_vn_session --force --dry-run
-# Gửi Telegram thật (trong phiên hoặc --force):
-.venv/bin/python -m vn_stock.scripts.run_hourly_vn_session --force
-# Heartbeat mỗi giờ kể cả khi 0 signal:
-.venv/bin/python -m vn_stock.scripts.run_hourly_vn_session --heartbeat
+.venv/bin/python -m vn_stock.scripts.run_hourly_vn_session --force            # gửi thật
+.venv/bin/python -m vn_stock.scripts.run_hourly_vn_session --heartbeat        # gửi cả khi 0 tín hiệu
 ```
 
-## Lên lịch (chọn 1)
+Flags: `--symbols`, `--intervals 1D,1H`, `--delay 3.5`, `--no-fetch`, `--force` (bỏ check giờ), `--dry-run`, `--heartbeat`, `--open-hour 8`, `--close-hour 15` (hoặc env `VN_SESSION_OPEN/CLOSE`).
 
-### A) cron (đơn giản)
+## launchd (đang dùng)
+
+`deploy/vn-hourly.plist` gọi thẳng `.venv/bin/python -m vn_stock.scripts.run_hourly_vn_session` với `PYTHONPATH` và `TZ=Asia/Ho_Chi_Minh`.
 
 ```bash
-crontab -e
+cp deploy/vn-hourly.plist ~/Library/LaunchAgents/com.cursor.vn-hourly.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.cursor.vn-hourly.plist
+launchctl kickstart gui/$(id -u)/com.cursor.vn-hourly        # chạy ngay 1 lần
+launchctl print gui/$(id -u)/com.cursor.vn-hourly | grep -E "state|last exit"
+launchctl bootout gui/$(id -u)/com.cursor.vn-hourly          # gỡ
+tail -f ~/Library/Logs/vn-hourly/hourly.log
 ```
 
-Thêm (máy để giờ Việt Nam):
+Mac ngủ đúng giờ → launchd chạy bù **một** lần khi thức, không chạy lại từng giờ bị lỡ.
+
+## cron (thay thế)
 
 ```
 5 8-14 * * 1-5  /Users/namnguyen/Documents/Cursor/stock/deploy/run_hourly_vn.sh
 ```
 
-Log: `vn_stock/data/screening/logs/hourly_vn_YYYYMMDD.log`
-
-### B) launchd (macOS, máy thức khi mở phiên)
-
-```bash
-cp /Users/namnguyen/Documents/Cursor/stock/deploy/vn-hourly.plist \
-   ~/Library/LaunchAgents/com.cursor.vn-hourly.plist
-launchctl load ~/Library/LaunchAgents/com.cursor.vn-hourly.plist
-# gỡ: launchctl unload ~/Library/LaunchAgents/com.cursor.vn-hourly.plist
-```
+Log: `vn_stock/data/screening/logs/hourly_vn_YYYYMMDD.log`. Không bật song song với launchd.
 
 ## Output
 
 | File | Ý nghĩa |
 |------|---------|
 | `vn_stock/data/screening/hourly_vn_snapshot.json` | Snapshot mới nhất (coverage + ideas) |
-| `vn_stock/data/screening/hourly_vn_YYYYMMDD_HHMM.json` | Lưu lịch sử từng lần chạy |
-| Telegram | Chỉ khi có **tier1/tier2** mới trong ngày (dedupe) |
+| `vn_stock/data/screening/hourly_vn_YYYYMMDD_HHMM.json` | Lịch sử từng lần chạy (gitignored) |
+| `vn_stock/data/screening/hourly_vn_sent.json` | Dedupe ý tưởng đã gửi trong ngày |
+| Telegram | Chỉ khi có tier1/tier2 mới |
 
-## Tín hiệu
+## Tín hiệu (`vn_stock/strategies/macd_signed.py`)
 
-- Engine: `botdown` MACD+RSI TP10%/SL4% + EMA20/50 (import, không sửa crypto)
-- **tier1:** hist cắt lên 0 + RSI < OB + EMA bull  
-- **tier2:** bull + RSI 30–48 + hist đang hồi (chưa cross)
+- **MACD+ (long)** / **MACD− (short)**: cross, tiếp diễn, đảo chiều; tier1 / tier2.
+- Vào lệnh theo vùng; **SL = swing + ATR**, **TP = 2R**. Không dùng TP10%/SL4% cố định.
+- Lệnh short chỉ mang tính tham khảo xu hướng: nhà đầu tư cá nhân trên HOSE gần như không bán khống được.
 
 Cần `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` trong `stock/.env`.

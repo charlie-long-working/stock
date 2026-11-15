@@ -11,7 +11,7 @@ build/
 .venv/
 venv/
 
-# Keep OHLCV + latest snapshot in git (Actions commits updates).
+# OHLCV + hourly snapshot: chỉ giữ local (bot hourly chạy launchd, không commit).
 # Ignore only noisy local run logs / dated snapshots:
 vn_stock/data/screening/logs/
 vn_stock/data/screening/hourly_vn_[0-9]*.json
@@ -30,3 +30,10 @@ Thumbs.db
 # vnstock cache
 .vnstock_cache/
 .mpl_cache/
+
+# Stock Intelligence: kết quả quét, cache, backtest (sinh lại được)
+vn_stock/data/intel/scans/
+vn_stock/data/intel/cache/
+vn_stock/data/intel/backtest/
+vn_stock/data/intel/latest.json
+vn_stock/data/intel/scan_status.json

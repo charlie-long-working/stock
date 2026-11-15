@@ -1,3 +1,5 @@
+> **LƯU TRỮ (15/11/2026):** Workflow này đã tắt — vnstock không còn trên PyPI nên GitHub Actions không cài được. Bot hourly hiện chạy bằng launchd trên Mac: xem `README_hourly_vn.md`. Nội dung dưới đây chỉ để tham khảo, nhiều chỗ đã cũ.
+
 # Chạy VN hourly trên GitHub Actions
 
 ## Cách khuyến nghị: repo `stock` trên GitHub

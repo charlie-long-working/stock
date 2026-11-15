@@ -1,3 +1,6 @@
+# ĐÃ TẮT (15/11/2026): vnstock bị gỡ khỏi PyPI nên bước pip install lỗi; GitHub đã disable (inactivity).
+# Bot hourly chạy bằng launchd trên Mac — xem deploy/README_hourly_vn.md. Giữ file để tham khảo.
+#
 # VN Hourly: cập nhật nến + tín hiệu → Telegram
 # Lịch ICT T2–T6 8:05–14:05 = UTC 1:05–7:05 Mon–Fri
 #
