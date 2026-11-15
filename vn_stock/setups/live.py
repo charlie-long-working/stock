@@ -25,7 +25,7 @@ CONFIG = Path(__file__).resolve().parent / "config.json"
 NAMES = {"base_breakout": "Phá nền giá đi ngang", "div_bull": "Phân kỳ dương MACD/RSI"}
 # Chiến lược cũ (đã chạy live trước khi có backtest); kết luận cũng đọc từ config.json
 # Chiến lược có trong dict này sẽ bị chuyển sang THEO DÕI khi kết luận ≠ ship (người dùng đã duyệt từng chiến lược)
-LEGACY_NAMES = {"macd_rsi_atr": "MACD+RSI (ATR)"}
+LEGACY_NAMES = {"macd_rsi_atr": "MACD+RSI (ATR)", "macd_signed": "MACD signed (MACD+)"}
 
 
 def verdict(strategy: str, live_cfg: Dict) -> Optional[str]:

@@ -89,7 +89,7 @@ class MainTests(unittest.TestCase):
         for s in ["AAA", "VNINDEX", "VN30", "HNXINDEX"]:
             prices(400, end="2026-11-13").to_csv(self.adj / f"{s}.csv", index=False)
 
-    def run_main(self, send, argv, tape=None, live=None, setups=None, collect=None, macd=True):
+    def run_main(self, send, argv, tape=None, live=None, setups=None, collect=None, macd=True, signed=None):
         r = (MACDRSIResult(signal=MACDRSISignalType.LONG, stop_loss=48.0, take_profit=55.0, rsi=58.0) if macd
              else MACDRSIResult(signal=MACDRSISignalType.NEUTRAL))
         self.collect = collect or mock.Mock(return_value=([], {}))
@@ -102,7 +102,7 @@ class MainTests(unittest.TestCase):
              mock.patch.object(R, "_intel_index", return_value=({"AAA": {}}, {"regime": "bearish"})), \
              mock.patch.object(R, "wait_for_intel", return_value="ok"), \
              mock.patch.object(R, "macd_rsi_signal", return_value=r), \
-             mock.patch.object(R, "macd_signed_signal", return_value=None), \
+             mock.patch.object(R, "macd_signed_signal", **({"side_effect": signed} if signed else {"return_value": None})), \
              mock.patch("vn_stock.notify.telegram.send_message", send), \
              mock.patch("sys.argv", ["x"] + argv), mock.patch("builtins.print"), at("2026-11-13T16:05:00"):
             return R.main()
@@ -203,6 +203,19 @@ class MainTests(unittest.TestCase):
         (self.tmp / "sent.json").unlink()
         self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], live=live)
         self.assertIn("🟢 LONG", send.call_args[0][0])
+
+    def test_macd_signed_off_is_watch_only(self):
+        from vn_stock.strategies.macd_signed import MacdSignedIdea
+        idea = MacdSignedIdea(side="long", regime="macd_pos", setup="cross", tier="tier1", entry=50.0, entry_low=49.5,
+                              entry_high=50.5, stop_loss=48.0, take_profit=54.0, risk=2.0, rr=2.0, rsi=55.0,
+                              hist=0.1, reason="cross up")
+        live = {"macd_signed": {"verdict": "off", "evidence": "PF 0,72", "config": {"exit": {"mode": "A"}}}}
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], live=live, macd=False,
+                      signed=[idea, None] * 5)
+        text = "\n".join(c[0][0] for c in send.call_args_list)
+        self.assertNotIn("🟢 LONG", text)
+        self.assertIn("MACD signed (MACD+)", text)
 
 
 if __name__ == "__main__":
