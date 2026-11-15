@@ -1,6 +1,7 @@
 """run_swing_vn: session/week boundaries, liquidity filter, long-only strategies, edge trigger, dedupe.
 Offline: synthetic prices, mocked strategies/clock/Telegram. Needs ../Trading-bot on PYTHONPATH (botdown.swing_common)."""
 
+import json
 import tempfile
 import unittest
 from datetime import datetime
@@ -88,9 +89,16 @@ class MainTests(unittest.TestCase):
         for s in ["AAA", "VNINDEX", "VN30", "HNXINDEX"]:
             prices(400, end="2026-11-13").to_csv(self.adj / f"{s}.csv", index=False)
 
-    def run_main(self, send, argv):
-        r = MACDRSIResult(signal=MACDRSISignalType.LONG, stop_loss=48.0, take_profit=55.0, rsi=58.0)
+    def run_main(self, send, argv, tape=None, live=None, setups=None, collect=None, macd=True):
+        r = (MACDRSIResult(signal=MACDRSISignalType.LONG, stop_loss=48.0, take_profit=55.0, rsi=58.0) if macd
+             else MACDRSIResult(signal=MACDRSISignalType.NEUTRAL))
+        self.collect = collect or mock.Mock(return_value=([], {}))
         with mock.patch.object(R, "ADJ", self.adj), mock.patch.object(R, "STORE", self.tmp / "sent.json"), \
+             mock.patch.object(R, "LEDGER_PATH", self.tmp / "ledger.json"), \
+             mock.patch.object(R.TAPE, "collect", self.collect), \
+             mock.patch.object(R.TAPE, "load_daily", return_value=tape if tape is not None else pd.DataFrame()), \
+             mock.patch.object(R.LIVE, "load_live_config", return_value=live or {}), \
+             mock.patch.object(R.LIVE, "scan_setups", return_value=setups or ([], [])), \
              mock.patch.object(R, "_intel_index", return_value=({"AAA": {}}, {"regime": "bearish"})), \
              mock.patch.object(R, "wait_for_intel", return_value="ok"), \
              mock.patch.object(R, "macd_rsi_signal", return_value=r), \
@@ -114,6 +122,67 @@ class MainTests(unittest.TestCase):
         with mock.patch.object(R, "_expected_last_session", return_value="2026-11-20"):
             self.run_main(send, ["--wait-min", "0", "--daily-only"])
         self.assertIn("chưa có phiên 2026-11-20", send.call_args[0][0])
+
+
+    def test_tape_collected_only_when_live(self):
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0"])
+        self.collect.assert_called_once()
+        self.run_main(send, ["--wait-min", "0", "--dry-run"])
+        self.collect.assert_not_called()
+        self.run_main(send, ["--wait-min", "0", "--no-tape"])
+        self.collect.assert_not_called()
+
+    def test_buy_goes_to_ledger_then_sell_message(self):
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"])
+        led = json.loads((self.tmp / "ledger.json").read_text())
+        self.assertEqual([p["status"] for p in led["positions"]], ["pending"])
+        self.assertIn("Tối đa ~", send.call_args[0][0])                     # % vốn trong tin MUA
+        # phiên sau: mở cửa rồi sập qua SL; 2 phiên sau nữa (T+2) mới bán được
+        df = pd.read_csv(self.adj / "AAA.csv", parse_dates=["time"])
+        last = df.iloc[-1]
+        extra = pd.DataFrame({"time": pd.bdate_range(last["time"], periods=4)[1:],
+                              "open": [last["close"], 40.0, 40.0], "high": [last["close"], 41.0, 41.0],
+                              "low": [40.0, 39.0, 39.0], "close": [40.0, 40.0, 40.0], "volume": 1_000_000.0})
+        pd.concat([df, extra]).to_csv(self.adj / "AAA.csv", index=False)
+        send.reset_mock()
+        with at("2026-11-18T16:05:00"):
+            self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], macd=False)
+        text = "\n".join(c[0][0] for c in send.call_args_list)
+        self.assertIn("BÁN / THOÁT", text)
+        self.assertIn("chạm cắt lỗ", text)
+
+    def test_dry_run_never_writes_ledger(self):
+        self.run_main(mock.Mock(return_value=(True, None)), ["--wait-min", "0", "--dry-run", "--daily-only"])
+        self.assertFalse((self.tmp / "ledger.json").exists())
+
+    def test_ship_and_watch_setups(self):
+        live = {"base_breakout": {"verdict": "ship", "evidence": "OOS tốt",
+                                  "config": {"exit": {"mode": "B", "time_stop": 40}}},
+                "div_bull": {"verdict": "watch", "evidence": "OOS chưa đạt", "config": {"exit": {"mode": "A"}}}}
+        ship = [{"setup": "base_breakout", "close": 60.0, "stop": 56.0, "target": None, "base_low": 55.0,
+                 "note": "nền 40 phiên"}]
+        watch = [{"setup": "div_bull", "close": 60.0, "stop": 57.0, "target": 66.0, "base_low": None,
+                  "note": "phân kỳ dương <x>"}]
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], live=live, setups=(ship, watch), macd=False)
+        text = "\n".join(c[0][0] for c in send.call_args_list)
+        self.assertIn("base_breakout", text)
+        self.assertIn("Theo dõi — chưa đạt kiểm chứng", text)
+        self.assertIn("phân kỳ dương &lt;x&gt;", text)
+        led = json.loads((self.tmp / "ledger.json").read_text())
+        self.assertEqual([p["strategy"] for p in led["positions"]], ["base_breakout"])
+
+    def test_tape_leaders_message(self):
+        tape = pd.DataFrame([{"date": "2026-11-13", "symbol": "AAA", "buy_vol": 3e6, "sell_vol": 1e6,
+                              "buy_value_bn": 30.0, "sell_value_bn": 10.0, "large_buy_value_bn": 5.0,
+                              "large_sell_value_bn": 1.0, "nar": 0.5, "reconciled": True}])
+        send = mock.Mock(return_value=(True, None))
+        self.run_main(send, ["--wait-min", "0", "--no-tape", "--daily-only"], tape=tape)
+        text = "\n".join(c[0][0] for c in send.call_args_list)
+        self.assertIn("Dòng tiền chủ động 2026-11-13", text)
+        self.assertIn("Mua chủ động ròng: 1p +50%", text)
 
 
 if __name__ == "__main__":

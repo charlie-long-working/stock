@@ -86,3 +86,11 @@ Không phải lời khuyên đầu tư.
 
 - `data_loaders/vn_news.py`: KBS + Google News `site:vietstock.vn` + RSS công khai **CafeF** (chứng khoán, doanh nghiệp, tài chính–ngân hàng), **Tin nhanh chứng khoán**, **VnEconomy** (`PRESS_FEEDS`, mỗi feed tải 1 lần/tiến trình, UA ghi rõ bot đọc tin). Tin theo mã khớp mã **hoặc tên công ty** (`ALIASES`), loại cụm gây nhầm (`EXCLUDE`, vd "FPT Retail" ≠ FPT). Thêm nguồn = 1 dòng trong `PRESS_FEEDS`.
 - Test offline: `PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m unittest discover -s tests -t .` — `test_vn_news.py`, `test_swing_vn.py` (+ test intel/ohlcv của Stock Intelligence).
+
+## Setup nền giá / phân kỳ / mua-bán chủ động / sổ lệnh (15/11/2026)
+
+- **Mua/bán chủ động** `vn_stock/tape/`: KBS intraday (1 request/mã, tổng tick = KL ngày, kiểm `reconciled`), lưu `data/tape/daily.csv` + tick thô `raw/<ngày>.csv.gz` (180 ngày). Chạy trong job swing-vn sau Stock Intelligence (~6 phút); chạy bù: `run_tape_collect`. KHÔNG dedupe theo `id` (KBS trùng id cho lệnh khớp giống nhau). Chỉ là bối cảnh tới khi đủ ≥120 phiên để kiểm chứng.
+- **Setup** `vn_stock/setups/`: `base_breakout` (nền N∈{20,40,60}, co biến động, cạn volume so với TRƯỚC nền, phá nền rvol/CLV), `divergence` (bọc `div_macd_rsi`, biết sau 5 nến), `exits.py` (một engine thoát cho cả backtest và sổ lệnh — T+2: bán được chiều phiên e+2), `sizing.py` (% vốn = 1% / rủi ro, trần 20%, 5 mã), `ledger.py` (sổ lệnh giấy, mức giá tương đối nên đúng cả khi điều chỉnh cổ tức), `live.py`.
+- **Backtest** `run_setup_backtest`: 97 mã, phí/thuế/trượt giá, T+2, chọn tham số chỉ trên train<2022 + validate 2022–2023, ngoài mẫu 2024+, 11 ngưỡng đạt chuẩn → `setups/config.json` (ship/watch/off, commit) + `docs/BACKTEST_SETUPS_<ngày>.md`. Kết quả 15/11: phá nền **WATCH** (PF 1,05), phân kỳ **OFF** (PF 0,74), `macd_rsi_atr` đang live **OFF** (PF 0,78, −0,63%/lệnh sau phí).
+- **Module mới KHÔNG import `vn_stock/intel/*`** (code chưa commit của phiên khác) — chỉ đọc file dữ liệu `data/intel/...`.
+- Test: `test_tape.py`, `test_setups.py` (có test chống nhìn trước), `test_setup_backtest.py`, `test_ledger.py` (có test đối chiếu live = backtest), `test_swing_vn.py`.

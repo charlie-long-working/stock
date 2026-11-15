@@ -38,3 +38,6 @@ vn_stock/data/intel/backtest/
 vn_stock/data/intel/latest.json
 vn_stock/data/intel/scan_status.json
 vn_stock/data/screening/swing_vn_sent.json
+vn_stock/data/tape/
+vn_stock/data/research/
+vn_stock/data/screening/swing_vn_ledger.json

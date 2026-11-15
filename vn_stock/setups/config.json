@@ -1,0 +1,89 @@
+{
+ "frozen_at": "2026-11-15T22:10:46",
+ "source": "data/research/setups_20261115_2210",
+ "setups": {
+  "base_breakout": {
+   "verdict": "watch",
+   "config": {
+    "id": "base_breakout-c9943385",
+    "setup": "base_breakout",
+    "params": {
+     "bbw_rank_max": 0.6,
+     "drift_frac": 1.0,
+     "dryup_max": 1.0,
+     "height_atr_k": 1.8,
+     "max_height": [
+      [
+       20,
+       0.18
+      ],
+      [
+       40,
+       0.22
+      ],
+      [
+       60,
+       0.27
+      ]
+     ],
+     "rvol_min": 2.0
+    },
+    "exit": {
+     "mode": "B",
+     "tp_r": 2.0,
+     "time_stop": 40,
+     "be_r": 1.0,
+     "trail_atr": 3.0,
+     "use_breakdown": true,
+     "use_bear_div": false,
+     "use_signal_exit": false
+    },
+    "regime_filter": false
+   },
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 139 lệnh, win 31%, PF 1.05, TB +0.16%/lệnh — WATCH"
+  },
+  "div_bull": {
+   "verdict": "off",
+   "config": {
+    "id": "div_bull-c21306f7",
+    "setup": "div_bull",
+    "params": {
+     "require_sma200": true,
+     "trigger": "immediate"
+    },
+    "exit": {
+     "mode": "B",
+     "tp_r": 2.0,
+     "time_stop": 40,
+     "be_r": 1.0,
+     "trail_atr": 3.0,
+     "use_breakdown": true,
+     "use_bear_div": true,
+     "use_signal_exit": false
+    },
+    "regime_filter": false
+   },
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 109 lệnh, win 25%, PF 0.74, TB -0.90%/lệnh — OFF"
+  },
+  "macd_rsi_atr": {
+   "verdict": "off",
+   "config": {
+    "id": "macd_rsi_atr-292a6b8e",
+    "setup": "macd_rsi_atr",
+    "params": {},
+    "exit": {
+     "mode": "A",
+     "tp_r": 1.6666666666666667,
+     "time_stop": 60,
+     "be_r": 1.0,
+     "trail_atr": 3.0,
+     "use_breakdown": false,
+     "use_bear_div": false,
+     "use_signal_exit": true
+    },
+    "regime_filter": false
+   },
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 2235 lệnh, win 33%, PF 0.78, TB -0.63%/lệnh — OFF"
+  }
+ }
+}

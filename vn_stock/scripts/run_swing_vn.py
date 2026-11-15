@@ -12,10 +12,16 @@ Stock Intelligence cập nhật; chờ tối đa --wait-min phút nếu lần qu
   Lọc thanh khoản: GTGD TB 20 phiên ≥ --min-value-bn tỷ. Kèm điểm/khuyến nghị Stock Intelligence,
   cờ EMA20/50, chế độ thị trường, xu hướng tuần.
 1W — bản tin xu hướng tuần (EMA20/50, mây Ichimoku, MACD, RSI) khi tuần đã đóng (sau 15:00 thứ 6).
+Thêm (11/2026):
+  - Thu thập mua/bán chủ động (vn_stock/tape) sau Stock Intelligence; tin "Dòng tiền chủ động" top 10/ngày.
+  - Setup nền giá/phân kỳ theo kết luận backtest đã khoá (vn_stock/setups/config.json): ship → MUA, watch → THEO DÕI.
+  - Sổ lệnh giấy (vn_stock/setups/ledger.py): mọi lệnh MUA đã gửi được theo dõi; báo BÁN/THOÁT theo cùng engine
+    thoát của backtest (T+2). Tin MUA ghi % vốn tối đa theo rủi ro 1% (trần 20%/mã, tối đa 5 mã).
 
   PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m vn_stock.scripts.run_swing_vn --dry-run
   ... --symbols VCB,FPT --wait-min 0 --dry-run
   ... --weekly-only --dry-run
+  ... --no-tape            # bỏ bước thu thập mua/bán chủ động (~6 phút, 100 request)
 """
 
 from __future__ import annotations
@@ -50,17 +56,23 @@ from botdown.swing_common import (  # noqa: E402  (shared with Trading-bot / pre
     weekly_trend,
 )
 from vn_stock import DATA_DIR  # noqa: E402
+from vn_stock.setups import live as LIVE  # noqa: E402
+from vn_stock.setups.ledger import STRATEGY_EXITS, Ledger, format_exit  # noqa: E402
+from vn_stock.setups.sizing import sizing_note  # noqa: E402
+from vn_stock.tape import collect as TAPE  # noqa: E402
+from vn_stock.tape.metrics import daily_leaders, format_leaders, tape_features, tape_note  # noqa: E402
 from vn_stock.strategies.macd_rsi import MACDRSISignalType, macd_rsi_signal  # noqa: E402
 from vn_stock.strategies.macd_signed import MacdSignedParams, macd_signed_signal  # noqa: E402
 
 INTEL = DATA_DIR / "intel"
 ADJ = INTEL / "ohlcv_adj"
 STORE = DATA_DIR / "screening" / "swing_vn_sent.json"
+LEDGER_PATH = DATA_DIR / "screening" / "swing_vn_ledger.json"
 INDICES = ["VNINDEX", "VN30", "HNXINDEX"]
 
 EVIDENCE = {
-    "macd_rsi_atr": "VN30 2016–08/2026: 2.309 lệnh, win 45%, PF trung vị 1,45 (chưa trừ phí); "
-                    "ngoài mẫu 2024+ ≈ hoà sau phí",
+    "macd_rsi_atr": "ngoài mẫu 2024+ (97 mã, sau phí, T+2): 2.235 lệnh, win 33%, PF 0,78, TB −0,63%/lệnh — "
+                    "CHƯA có lợi thế (docs/BACKTEST_SETUPS_2026-11-15.md)",
     "macd_signed": "VN30: PF trung vị 1,37 (bản có short); bản chỉ MUA chưa backtest riêng",
 }
 
@@ -143,7 +155,7 @@ def _weekly(df: pd.DataFrame) -> Tuple[Optional[dict], Optional[str]]:
 
 
 def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
-                min_value_bn: float) -> Tuple[List[Signal], Optional[str]]:
+                min_value_bn: float, tape: Optional[dict] = None) -> Tuple[List[Signal], Optional[str]]:
     """Trả về (tín hiệu, lý do bỏ qua)."""
     if len(df) < 80:
         return [], "thiếu dữ liệu"
@@ -162,6 +174,9 @@ def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
     note_i = _intel_note(rec)
     if note_i:
         notes.append(note_i)
+    note_t = tape_note(tape) if tape else None
+    if note_t:
+        notes.append(note_t)
 
     out: List[Signal] = []
     r = macd_rsi_signal(hi, lo, cl)
@@ -171,7 +186,7 @@ def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
             rule=f"MACD hist cắt lên 0 + RSI {r.rsi:.0f} < 70; SL 1,5×ATR, TP 2,5×ATR",
             bar_time=bar, entry=float(cl[-1]), stop=r.stop_loss, target=r.take_profit,
             max_hold="tới khi hist MACD cắt xuống 0 hoặc chạm SL/TP", evidence=EVIDENCE["macd_rsi_atr"],
-            notes=list(notes), unit="nghìn đ",
+            notes=list(notes) + [sizing_note(float(cl[-1]), r.stop_loss)], unit="nghìn đ",
         ))
 
     p = MacdSignedParams(allow_short=False)
@@ -184,13 +199,14 @@ def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
             rule=f"{idea.tier} · {idea.setup} · {idea.reason} · vùng mua {idea.entry_low:,.2f}–{idea.entry_high:,.2f}",
             bar_time=bar, entry=float(idea.entry), stop=float(idea.stop_loss), target=float(idea.take_profit),
             max_hold="tới khi hist MACD đảo chiều hoặc chạm SL/TP", evidence=EVIDENCE["macd_signed"],
-            notes=list(notes), unit="nghìn đ",
+            notes=list(notes) + [sizing_note(float(idea.entry), float(idea.stop_loss))], unit="nghìn đ",
         ))
     return out, None
 
 
 def weekly_block(week_end: str, idx_rows: List[Tuple[str, Optional[dict]]],
-                 stock_trends: Dict[str, Optional[dict]], rec_by: Dict[str, dict]) -> str:
+                 stock_trends: Dict[str, Optional[dict]], rec_by: Dict[str, dict],
+                 ledger_stats: Optional[dict] = None) -> str:
     up = sorted(s for s, t in stock_trends.items() if t and t["bias"] == "Tăng")
     dn = sorted(s for s, t in stock_trends.items() if t and t["bias"] == "Giảm")
     mid = sorted(s for s, t in stock_trends.items() if t and t["bias"] == "Trung tính")
@@ -212,6 +228,25 @@ def weekly_block(week_end: str, idx_rows: List[Tuple[str, Optional[dict]]],
         "",
         "<i>Xu hướng tuần = bộ lọc bối cảnh cho lệnh 1D (ưu tiên MUA mã đang Tăng), chưa backtest như tín hiệu riêng.</i>",
     ]
+    if ledger_stats and ledger_stats.get("closed"):
+        lines.append(f"Sổ lệnh giấy: {ledger_stats['closed']} lệnh đã đóng · win {ledger_stats['win'] * 100:.0f}% · "
+                     f"TB {ledger_stats['avg_ret'] * 100:+.2f}%/lệnh · {ledger_stats['avg_r']:+.2f}R · "
+                     f"đang mở {ledger_stats['open']}")
+    elif ledger_stats:
+        lines.append(f"Sổ lệnh giấy: chưa có lệnh đóng · đang chờ/mở {ledger_stats.get('open', 0)}")
+    return "\n".join(lines)
+
+
+def watch_block(date: str, items: List[Tuple[str, dict]], live_cfg: dict) -> str:
+    lines = [f"👀 <b>Theo dõi — chưa đạt kiểm chứng</b> {h(date)}"]
+    for sym, it in items:
+        lines.append(f"• <b>{h(sym)}</b> {h(LIVE.NAMES.get(it['setup'], it['setup']))}: {h(it['note'])}")
+    ev = {it["setup"] for _, it in items}
+    for s in sorted(ev):
+        e = LIVE.evidence(s, live_cfg)
+        if e:
+            lines.append(f"<i>{h(LIVE.NAMES.get(s, s))} — {h(e)}</i>")
+    lines.append("<i>Không có mức giá vào lệnh và không vào sổ lệnh vì backtest ngoài mẫu chưa đạt ngưỡng.</i>")
     return "\n".join(lines)
 
 
@@ -225,6 +260,8 @@ def main() -> int:
     ap.add_argument("--heartbeat", action="store_true")
     ap.add_argument("--weekly-only", action="store_true")
     ap.add_argument("--daily-only", action="store_true")
+    ap.add_argument("--no-tape", action="store_true", help="không thu thập mua/bán chủ động")
+    ap.add_argument("--tape", action="store_true", help="thu thập cả khi --dry-run (gọi API thật)")
     args = ap.parse_args()
 
     from vn_stock.notify.telegram import send_message
@@ -237,13 +274,27 @@ def main() -> int:
     expected = _expected_last_session()
     store = SentStore(STORE)
     seen = (lambda k: False) if args.no_dedupe else (lambda k: k in store)
+    live_cfg = LIVE.load_live_config()
+    ledger = Ledger(LEDGER_PATH)
+
+    if not args.weekly_only and not args.no_tape and (not args.dry_run or args.tape):
+        try:
+            TAPE.collect(symbols, expected)
+        except Exception as e:  # noqa: BLE001 — thiếu tape không chặn tín hiệu
+            print(f"  tape lỗi: {e}")
+    tape_daily = TAPE.load_daily()
+    tape_cov = int((tape_daily["date"] == expected).sum()) if len(tape_daily) else 0
 
     blocks: List[str] = []
     keys: List[str] = []
     stock_trends: Dict[str, Optional[dict]] = {}
     week_end: Optional[str] = None
     signals: List[Signal] = []
+    watch_items: List[Tuple[str, dict]] = []
+    exit_blocks: List[Tuple[str, str]] = []
+    data_by: Dict[str, pd.DataFrame] = {}
     stale, skipped = [], 0
+    active_syms = {p["symbol"] for p in ledger.active()}
 
     for sym in symbols:
         df = _load(sym)
@@ -259,27 +310,78 @@ def main() -> int:
             continue
         if args.weekly_only:
             continue
-        sigs, why = scan_symbol(sym, df, rec_by.get(sym), regime.get("regime", ""), args.min_value_bn)
+        data_by[sym] = df
+        if sym in active_syms:
+            for rec in ledger.process(sym, df, LIVE.flag_arrays(df)):
+                exit_blocks.append((f"EXIT|{rec['id']}", format_exit(rec)))
+        tf = tape_features(tape_daily, sym, expected) if len(tape_daily) else None
+        sigs, why = scan_symbol(sym, df, rec_by.get(sym), regime.get("regime", ""), args.min_value_bn, tf)
         if why:
             skipped += 1
+        else:
+            ship, watch = LIVE.scan_setups(sym, df, live_cfg)
+            watch_items += [(sym, w) for w in watch]
+            for it in ship:
+                ep = LIVE.exit_params(it["setup"], live_cfg)
+                sigs.append(Signal(
+                    asset="vn", symbol=sym, tf="1D", side="long", strategy=it["setup"], rule=it["note"],
+                    bar_time=pd.Timestamp(df["time"].iloc[-1]).strftime("%Y-%m-%d"), entry=it["close"],
+                    stop=it["stop"], target=it["target"],
+                    max_hold=f"{ep.time_stop} phiên" + (" · trailing" if ep.mode == "B" else ""),
+                    evidence=LIVE.evidence(it["setup"], live_cfg),
+                    notes=[n for n in [tape_note(tf) if tf else None, sizing_note(it["close"], it["stop"]),
+                                       "T+2: mua hôm nay, sớm nhất bán chiều T+2"] if n],
+                    unit="nghìn đ"))
+                sigs[-1]._base_low = it.get("base_low")
         for s in sigs:
-            print(f"  SIGNAL {s.strategy} {sym} {s.bar_time} entry={s.entry:.2f} SL={s.stop:.2f} TP={s.target:.2f}")
+            tp = f"{s.target:.2f}" if s.target is not None else "trailing"
+            print(f"  SIGNAL {s.strategy} {sym} {s.bar_time} entry={s.entry:.2f} SL={s.stop:.2f} TP={tp}")
             signals.append(s)
     print(f"  {len(symbols)} mã · dữ liệu cũ {len(stale)} · lọc thanh khoản {skipped} · tín hiệu {len(signals)}"
           f" · phiên mong đợi {expected}")
+
+    # vị thế đang mở của mã không được quét (vd dữ liệu cũ) vẫn cần tính lại
+    for sym in sorted(active_syms - set(data_by)):
+        df = _load(sym)
+        if df is not None and not args.weekly_only:
+            for rec in ledger.process(sym, df, LIVE.flag_arrays(df)):
+                exit_blocks.append((f"EXIT|{rec['id']}", format_exit(rec)))
+
+    for k, b in exit_blocks:            # BÁN trước
+        if not seen(k):
+            blocks.append(b)
+            keys.append(k)
+
+    for s in signals:
+        if seen(s.key):
+            continue
+        ep = STRATEGY_EXITS.get(s.strategy) or LIVE.exit_params(s.strategy, live_cfg)
+        pid = ledger.add(s.symbol, s.strategy, s.bar_time, s.entry, s.stop, s.target, ep,
+                         getattr(s, "_base_low", None)) if ep else None
+        if pid is None and ep:
+            s.notes.append("Sổ lệnh giấy đã đủ 5 vị thế (hoặc đã có) — lệnh này không được theo dõi để báo BÁN")
+        blocks.append(format_signal(s, stock_trends.get(s.symbol)))
+        keys.append(s.key)
+
+    if watch_items and not seen(f"WATCH|vn|{expected}"):
+        blocks.append(watch_block(expected, watch_items, live_cfg))
+        keys.append(f"WATCH|vn|{expected}")
+
+    if not args.weekly_only and tape_cov and not seen(f"TAPE|{expected}"):
+        tb, ts = daily_leaders(tape_daily, expected)
+        cov = f"Dữ liệu {tape_cov}/{len(symbols)} mã" + (" — thiếu, tham khảo thận trọng" if tape_cov < 0.8 * len(symbols) else "")
+        msg = format_leaders(expected, tb, ts, cov)
+        if msg:
+            blocks.append(msg)
+            keys.append(f"TAPE|{expected}")
 
     if not args.daily_only and week_end and not seen(f"WEEKLY|vn|{week_end}"):
         idx_rows = []
         for name in INDICES:
             d = _load(name)
             idx_rows.append((name, _weekly(d)[0] if d is not None else None))
-        blocks.append(weekly_block(week_end, idx_rows, stock_trends, rec_by))
+        blocks.append(weekly_block(week_end, idx_rows, stock_trends, rec_by, ledger.stats()))
         keys.append(f"WEEKLY|vn|{week_end}")
-
-    for s in signals:
-        if not seen(s.key):
-            blocks.append(format_signal(s, stock_trends.get(s.symbol)))
-            keys.append(s.key)
 
     if not args.weekly_only and not signals and args.heartbeat and not seen(f"HEARTBEAT|vn|{expected}"):
         blocks.append(f"📭 Cổ phiếu VN 1D {h(expected)}: không có tín hiệu MUA "
@@ -297,6 +399,7 @@ def main() -> int:
         for k in keys:
             store.add(k)
         store.save()
+        ledger.save()
     print(f"{'DRY ' if args.dry_run else ''}blocks={len(blocks)} ok={ok}")
     return 0 if ok else 1
 

@@ -88,3 +88,13 @@ Vietstock (KBS + Google News), CafeF, Tin nhanh chứng khoán, VnEconomy — RS
 PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m unittest discover -s tests -t .
 ```
 Offline (dữ liệu giả, mock mạng/Telegram): `tests/test_vn_news.py`, `tests/test_swing_vn.py`, cùng test của Stock Intelligence.
+
+## Nền giá, phân kỳ, mua/bán chủ động, sổ lệnh (15/11/2026)
+
+| Phần | Lệnh | Ghi chú |
+|------|------|---------|
+| Thu thập mua/bán chủ động | `$PY -m vn_stock.scripts.run_tape_collect [--symbols VCB,HPG] [--dry-run]` | Tự chạy trong job 16:00; dữ liệu `vn_stock/data/tape/` (gitignored) |
+| Backtest setup + ngưỡng | `$PY -m vn_stock.scripts.run_setup_backtest` | ~80 giây; ghi `vn_stock/setups/config.json` + `docs/BACKTEST_SETUPS_<ngày>.md` |
+| Bot | `run_swing_vn` | BÁN/THOÁT từ sổ lệnh giấy → MUA (kèm % vốn tối đa, mua chủ động ròng) → THEO DÕI → top 10 dòng tiền → bản tin tuần |
+
+Kết quả backtest ngoài mẫu 2024+ (sau phí, T+2): xem `docs/BACKTEST_SETUPS_2026-11-15.md`. Chưa setup nào đạt ngưỡng để thành lệnh MUA; phá nền chỉ ở dạng THEO DÕI.
