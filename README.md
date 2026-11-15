@@ -77,3 +77,14 @@ PY=.venv/bin/python
 - `vietnam_rates.py` còn trỏ đường dẫn cũ trong Trading-bot.
 
 Không phải lời khuyên đầu tư.
+
+## Nguồn tin của digest
+
+Vietstock (KBS + Google News), CafeF, Tin nhanh chứng khoán, VnEconomy — RSS công khai, không cần token, không vượt chặn bot. Mỗi tin ghi `[nguồn]`. Danh sách: `PRESS_FEEDS` trong `vn_stock/data_loaders/vn_news.py`.
+
+## Test
+
+```bash
+PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m unittest discover -s tests -t .
+```
+Offline (dữ liệu giả, mock mạng/Telegram): `tests/test_vn_news.py`, `tests/test_swing_vn.py`, cùng test của Stock Intelligence.

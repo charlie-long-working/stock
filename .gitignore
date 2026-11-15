@@ -37,3 +37,4 @@ vn_stock/data/intel/cache/
 vn_stock/data/intel/backtest/
 vn_stock/data/intel/latest.json
 vn_stock/data/intel/scan_status.json
+vn_stock/data/screening/swing_vn_sent.json

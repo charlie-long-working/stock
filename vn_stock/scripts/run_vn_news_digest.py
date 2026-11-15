@@ -3,7 +3,7 @@
 Digest tin Vietstock + chỉ số cơ bản cho watchlist VN → Telegram.
 
   - Tin theo mã: KBS stockinfo + Google News `site:vietstock.vn` (xem data_loaders/vn_news.py)
-  - Nhận định thị trường: bài PTKT / nhận định của Vietstock trong N ngày
+  - Nhận định thị trường: bài PTKT / nhận định (Vietstock, CafeF, Tin nhanh CK, VnEconomy) trong N ngày
   - Cơ bản: P/E, P/B, ROE từ cache vn_stock/data/fundamentals (ghi rõ ngày cache)
 
 Không cần token Vietstock. Chỉ gửi tin chưa gửi (cache hash tiêu đề).
@@ -92,7 +92,8 @@ def _latest_period(ratios_csv: Path) -> str:
 
 def _fmt_item(it: NewsItem) -> str:
     when = it.published.astimezone(TZ).strftime("%d/%m %H:%M") if it.published else "—"
-    return f"• {when} <a href=\"{html.escape(it.url, quote=True)}\">{html.escape(it.title)}</a>"
+    return (f"• {when} <a href=\"{html.escape(it.url, quote=True)}\">{html.escape(it.title)}</a>"
+            f" <i>[{html.escape(it.source_name)}]</i>")
 
 
 def build_messages(
@@ -102,7 +103,7 @@ def build_messages(
 ) -> List[str]:
     blocks: List[str] = []
     if market:
-        blocks.append("<b>📊 Nhận định thị trường (Vietstock)</b>\n" + "\n".join(_fmt_item(i) for i in market))
+        blocks.append("<b>📊 Nhận định thị trường</b>\n" + "\n".join(_fmt_item(i) for i in market))
     for sym, items in per_symbol.items():
         if not items:
             continue
@@ -116,11 +117,21 @@ def build_messages(
     title = f"📰 <b>Tin VN</b> {datetime.now(TZ).strftime('%d/%m/%Y %H:%M')}"
     msgs, cur = [], title
     for b in blocks:
-        if len(cur) + len(b) + 2 > TG_LIMIT:
-            msgs.append(cur)
-            cur = b
-        else:
-            cur += "\n\n" + b
+        # một khối quá dài (nhiều tin / tiêu đề dài) → tách theo dòng, mỗi dòng là một tin trọn vẹn
+        pieces, buf = [], ""
+        for line in b.split("\n"):
+            if buf and len(buf) + len(line) + 1 > TG_LIMIT:
+                pieces.append(buf)
+                buf = line
+            else:
+                buf = f"{buf}\n{line}" if buf else line
+        pieces.append(buf)
+        for p in pieces:
+            if len(cur) + len(p) + 2 > TG_LIMIT:
+                msgs.append(cur)
+                cur = p
+            else:
+                cur += "\n\n" + p
     msgs.append(cur)
     return msgs
 

@@ -81,3 +81,8 @@ Script list + flags đầy đủ: `README.md` mục Scripts.
 - Repo public: đừng commit `.env`, số liệu cá nhân, đường dẫn nhạy cảm.
 
 Không phải lời khuyên đầu tư.
+
+## Tin tức & test (cập nhật 15/11/2026)
+
+- `data_loaders/vn_news.py`: KBS + Google News `site:vietstock.vn` + RSS công khai **CafeF** (chứng khoán, doanh nghiệp, tài chính–ngân hàng), **Tin nhanh chứng khoán**, **VnEconomy** (`PRESS_FEEDS`, mỗi feed tải 1 lần/tiến trình, UA ghi rõ bot đọc tin). Tin theo mã khớp mã **hoặc tên công ty** (`ALIASES`), loại cụm gây nhầm (`EXCLUDE`, vd "FPT Retail" ≠ FPT). Thêm nguồn = 1 dòng trong `PRESS_FEEDS`.
+- Test offline: `PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m unittest discover -s tests -t .` — `test_vn_news.py`, `test_swing_vn.py` (+ test intel/ohlcv của Stock Intelligence).
