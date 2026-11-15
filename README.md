@@ -13,12 +13,14 @@ Package `vn_stock`: crawl giá (vnstock), screen VN30, backtest đa chiến lư�
 
 | Job | Ở đâu | Lịch (giờ VN) | Ghi chú |
 |-----|-------|---------------|---------|
-| Tín hiệu hourly | launchd `com.cursor.vn-hourly` trên Mac | T2–T6, :05 từ 8h–14h | Mac phải thức. Log `~/Library/Logs/vn-hourly/hourly.log` |
+| Tín hiệu nến ngày + bản tin tuần | launchd `com.cursor.swing-vn` trên Mac | T2–T6 16:00 | Chỉ lệnh MUA; `macd_rsi_atr` + `macd_signed`. Log `~/Library/Logs/swing/vn.log` |
+| ~~Tín hiệu hourly~~ | launchd `com.cursor.vn-hourly` | — | Gỡ 15/11/2026 (Mac chỉ chạy nến ngày/tuần) |
 | Digest tin Vietstock | GitHub Actions `vn-news-digest.yml` | T2–T6 7:45 | Không cần token Vietstock. Commit cache tin đã gửi |
 | VN Hourly trên GitHub | `vn-hourly-telegram.yml` | — | **Đã tắt**: vnstock không còn trên PyPI |
 
-Cài lại launchd: `cp deploy/vn-hourly.plist ~/Library/LaunchAgents/com.cursor.vn-hourly.plist && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.cursor.vn-hourly.plist`
-Tắt: `launchctl bootout gui/$(id -u)/com.cursor.vn-hourly`
+Cài lại launchd: `cp deploy/swing-vn.plist ~/Library/LaunchAgents/com.cursor.swing-vn.plist && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.cursor.swing-vn.plist`
+Tắt: `launchctl bootout gui/$(id -u)/com.cursor.swing-vn`
+Chạy thử: `PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m vn_stock.scripts.run_swing_vn --dry-run --wait-min 0`
 
 Env (`.env`, xem `.env.example`): `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Tuỳ chọn `VN_SESSION_OPEN` / `VN_SESSION_CLOSE`.
 

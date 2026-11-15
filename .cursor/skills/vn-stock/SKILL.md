@@ -28,12 +28,18 @@ Crypto → `trading-bot`. Vàng/bạc → `precious-metals`. BĐS macro → `rea
 
 | Job | Chạy ở đâu | Lịch (ICT) | Entry | Log / state |
 |-----|-----------|-----------|-------|-------------|
-| Hourly signal | launchd `com.cursor.vn-hourly` (Mac phải thức) | T2–T6 :05, 8h–14h | `vn_stock/scripts/run_hourly_vn_session.py` | `~/Library/Logs/vn-hourly/hourly.log`, `screening/hourly_vn_snapshot.json` |
+| **Swing 1D + bản tin 1W** | launchd `com.cursor.swing-vn` | T2–T6 16:00 (sau intel 15:30, chờ tối đa 25′) | `vn_stock/scripts/run_swing_vn.py` | `~/Library/Logs/swing/vn.log`, `screening/swing_vn_sent.json` |
+| ~~Hourly signal~~ | launchd `com.cursor.vn-hourly` | — | `run_hourly_vn_session.py` | **gỡ 15/11/2026** (plist `.disabled`): Mac chỉ chạy nến ngày/tuần |
 | News digest | GitHub Actions `vn-news-digest.yml` | T2–T6 7:45 | `vn_stock/scripts/run_vn_news_digest.py` | commit `screening/vn_news_sent.json` |
 | ~~VN Hourly GHA~~ | `vn-hourly-telegram.yml` | — | — | **disabled** (vnstock không cài được) |
 
-launchd: plist nguồn `deploy/vn-hourly.plist` → `~/Library/LaunchAgents/com.cursor.vn-hourly.plist`.
-Bật/tắt: `launchctl bootstrap|bootout gui/$(id -u) ~/Library/LaunchAgents/com.cursor.vn-hourly.plist`.
+launchd: plist nguồn `deploy/swing-vn.plist` → `~/Library/LaunchAgents/com.cursor.swing-vn.plist`.
+Bật/tắt: `launchctl bootstrap|bootout gui/$(id -u) ~/Library/LaunchAgents/com.cursor.swing-vn.plist`.
+
+**Swing 1D/1W** (`run_swing_vn`): đọc kho giá điều chỉnh `data/intel/ohlcv_adj/` (không gọi API), 100 mã intel, chỉ lệnh MUA:
+`macd_rsi_atr` (MACD hist cắt lên 0 + RSI<70, SL 1,5×ATR / TP 2,5×ATR — tốt nhất backtest VN30 toàn mẫu, ngoài mẫu ≈ hoà sau phí)
+và `macd_signed` long-only (chỉ báo khi setup mới). Lọc GTGD TB20 ≥ 10 tỷ; kèm điểm intel (★ ≥80), EMA20/50, regime, xu hướng tuần.
+Bản tin 1W (W-FRI) gửi một lần khi tuần đóng. Format/dedupe dùng chung `Trading-bot/botdown/swing_common.py`.
 Telegram env: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (env → `stock/.env` → `../Trading-bot/.env`).
 
 ## Map
