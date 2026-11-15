@@ -75,8 +75,19 @@ def _fundamentals_line(symbol: str) -> Optional[str]:
         parts.append(f"ROE {r['roe'] * 100:.1f}%")
     if not parts:
         return None
-    asof = datetime.fromtimestamp(ratios_csv.stat().st_mtime, TZ).strftime("%d/%m/%Y")
-    return f"{' · '.join(parts)} <i>(BCTC cache {asof})</i>"
+    return f"{' · '.join(parts)} <i>(BCTC {_latest_period(ratios_csv)})</i>"
+
+
+def _latest_period(ratios_csv: Path) -> str:
+    """Kỳ báo cáo mới nhất trong cache (vd Q4/2025). Không dùng mtime: trên CI mtime = lúc checkout."""
+    import pandas as pd
+
+    try:
+        df = pd.read_csv(ratios_csv, usecols=["yearReport", "lengthReport"])
+        y, q = df.sort_values(["yearReport", "lengthReport"]).iloc[-1]
+        return f"Q{int(q)}/{int(y)}" if int(q) in (1, 2, 3, 4) else str(int(y))
+    except (ValueError, KeyError, IndexError):
+        return "cache"
 
 
 def _fmt_item(it: NewsItem) -> str:
@@ -120,7 +131,7 @@ def main() -> int:
     ap.add_argument("--days", type=int, default=2, help="cửa sổ tin theo mã (ngày)")
     ap.add_argument("--market-days", type=int, default=1, help="cửa sổ bài nhận định (ngày)")
     ap.add_argument("--per-symbol", type=int, default=3, help="số tin tối đa mỗi mã")
-    ap.add_argument("--dry-run", action="store_true", help="in ra, không gửi Telegram, không ghi cache")
+    ap.add_argument("--dry-run", action="store_true", help="in ra, không gửi Telegram, không ghi cache tin đã gửi (vẫn ghi snapshot)")
     ap.add_argument("--no-dedupe", action="store_true", help="bỏ qua cache tin đã gửi")
     args = ap.parse_args()
 
