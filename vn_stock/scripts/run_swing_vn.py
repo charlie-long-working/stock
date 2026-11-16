@@ -18,6 +18,9 @@ Thêm (11/2026):
   - Setup nền giá/phân kỳ theo kết luận backtest đã khoá (vn_stock/setups/config.json): ship → MUA, watch → THEO DÕI.
   - Sổ lệnh giấy (vn_stock/setups/ledger.py): mọi lệnh MUA đã gửi được theo dõi; báo BÁN/THOÁT theo cùng engine
     thoát của backtest (T+2). Tin MUA ghi % vốn tối đa theo rủi ro 1% (trần 20%/mã, tối đa 5 mã).
+  - Bộ lọc xu hướng (vn_stock/setups/trend.py, 16/11/2026): mỗi tin MUA/THEO DÕI ghi vị trí giá so với
+    EMA25/50/200 và dải tuần SMA20W/EMA21W (✅ thuận / ➖ lẫn lộn / ⚠️ ngược xu hướng). Chiến lược nào có
+    cấu hình khoá với `trend` ≠ none (chọn bằng backtest) thì tín hiệu ngược bộ lọc bị loại.
 
   PYTHONPATH="$PWD:$PWD/../Trading-bot" .venv/bin/python -m vn_stock.scripts.run_swing_vn --dry-run
   ... --symbols VCB,FPT --wait-min 0 --dry-run
@@ -58,6 +61,7 @@ from botdown.swing_common import (  # noqa: E402  (shared with Trading-bot / pre
 )
 from vn_stock import DATA_DIR  # noqa: E402
 from vn_stock.setups import live as LIVE  # noqa: E402
+from vn_stock.setups import trend as TR  # noqa: E402
 from vn_stock.setups.ledger import STRATEGY_EXITS, Ledger, format_exit  # noqa: E402
 from vn_stock.setups.sizing import sizing_note  # noqa: E402
 from vn_stock.tape import collect as TAPE  # noqa: E402
@@ -157,8 +161,9 @@ def _weekly(df: pd.DataFrame) -> Tuple[Optional[dict], Optional[str]]:
 
 
 def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
-                min_value_bn: float, tape: Optional[dict] = None) -> Tuple[List[Signal], Optional[str]]:
-    """Trả về (tín hiệu, lý do bỏ qua)."""
+                min_value_bn: float, tape: Optional[dict] = None, live_cfg: Optional[dict] = None,
+                tf: Optional[pd.DataFrame] = None) -> Tuple[List[Signal], Optional[str]]:
+    """Trả về (tín hiệu, lý do bỏ qua). Tín hiệu ngược bộ lọc xu hướng của cấu hình khoá bị loại."""
     if len(df) < 80:
         return [], "thiếu dữ liệu"
     hi, lo, cl = (df[c].to_numpy(float) for c in ("high", "low", "close"))
@@ -179,6 +184,9 @@ def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
     note_t = tape_note(tape) if tape else None
     if note_t:
         notes.append(note_t)
+    tf = tf if tf is not None else TR.trend_frame(df)
+    notes.append(TR.describe(TR.snapshot(df, tf)))
+    live_cfg = live_cfg or {}
 
     out: List[Signal] = []
     r = macd_rsi_signal(hi, lo, cl)
@@ -203,7 +211,13 @@ def scan_symbol(sym: str, df: pd.DataFrame, rec: Optional[dict], regime: str,
             max_hold="tới khi hist MACD đảo chiều hoặc chạm SL/TP", evidence=EVIDENCE["macd_signed"],
             notes=list(notes) + [sizing_note(float(idea.entry), float(idea.stop_loss))], unit="nghìn đ",
         ))
-    return out, None
+    kept = []
+    for s in out:
+        if LIVE.trend_ok(s.strategy, live_cfg, tf):
+            kept.append(s)
+        else:
+            print(f"  TREND-SKIP {s.strategy} {sym} {s.bar_time}: ngược bộ lọc {LIVE.trend_mode(s.strategy, live_cfg)}")
+    return kept, None
 
 
 def weekly_block(week_end: str, idx_rows: List[Tuple[str, Optional[dict]]],
@@ -239,16 +253,25 @@ def weekly_block(week_end: str, idx_rows: List[Tuple[str, Optional[dict]]],
     return "\n".join(lines)
 
 
-def watch_block(date: str, items: List[Tuple[str, dict]], live_cfg: dict) -> str:
+def watch_block(date: str, items: List[Tuple[str, dict]], live_cfg: dict,
+                trend_by: Optional[Dict[str, dict]] = None) -> str:
+    trend_by = trend_by or {}
+    order = {"up": 0, "mixed": 1, "down": 2}
+    items = sorted(items, key=lambda x: order.get((trend_by.get(x[0]) or {}).get("state"), 3))
     lines = [f"👀 <b>Theo dõi — chưa đạt kiểm chứng</b> {h(date)}"]
     for sym, it in items:
-        lines.append(f"• <b>{h(sym)}</b> {h(LIVE.display_name(it['setup']))}: {h(it['note'])}")
+        st = (trend_by.get(sym) or {}).get("state")
+        tag = f" [{TR.LABEL[st]}]" if st in TR.LABEL else ""
+        lines.append(f"• <b>{h(sym)}</b> {h(LIVE.display_name(it['setup']))}{h(tag)}: {h(it['note'])}")
     ev = {it["setup"] for _, it in items}
     for s in sorted(ev):
         e = LIVE.evidence(s, live_cfg)
         if e:
             lines.append(f"<i>{h(LIVE.display_name(s))} — {h(e)}</i>")
     lines.append("<i>Không có mức giá vào lệnh và không vào sổ lệnh vì backtest ngoài mẫu chưa đạt ngưỡng.</i>")
+    if any((trend_by.get(s) or {}).get("state") for s, _ in items):
+        lines.append("<i>Xu hướng: ✅ giá trên EMA50, EMA200 và dải tuần SMA20W/EMA21W · ⚠️ dưới EMA200 và dưới dải tuần"
+                     " (phá vỡ ngược xu hướng khung lớn dễ thất bại).</i>")
     return "\n".join(lines)
 
 
@@ -293,6 +316,7 @@ def main() -> int:
     week_end: Optional[str] = None
     signals: List[Signal] = []
     watch_items: List[Tuple[str, dict]] = []
+    trend_by: Dict[str, dict] = {}
     exit_blocks: List[Tuple[str, str]] = []
     data_by: Dict[str, pd.DataFrame] = {}
     stale, skipped = [], 0
@@ -317,11 +341,14 @@ def main() -> int:
             for rec in ledger.process(sym, df, LIVE.flag_arrays(df)):
                 exit_blocks.append((f"EXIT|{rec['id']}", format_exit(rec)))
         tf = tape_features(tape_daily, sym, expected) if len(tape_daily) else None
-        sigs, why = scan_symbol(sym, df, rec_by.get(sym), regime.get("regime", ""), args.min_value_bn, tf)
+        trf = TR.trend_frame(df)
+        trend_by[sym] = TR.snapshot(df, trf)
+        sigs, why = scan_symbol(sym, df, rec_by.get(sym), regime.get("regime", ""), args.min_value_bn, tf,
+                                live_cfg, trf)
         if why:
             skipped += 1
         else:
-            ship, watch = LIVE.scan_setups(sym, df, live_cfg)
+            ship, watch = LIVE.scan_setups(sym, df, live_cfg, tf=trf)
             watch_items += [(sym, w) for w in watch]
             for it in ship:
                 ep = LIVE.exit_params(it["setup"], live_cfg)
@@ -331,7 +358,8 @@ def main() -> int:
                     stop=it["stop"], target=it["target"],
                     max_hold=f"{ep.time_stop} phiên" + (" · trailing" if ep.mode == "B" else ""),
                     evidence=LIVE.evidence(it["setup"], live_cfg),
-                    notes=[n for n in [tape_note(tf) if tf else None, sizing_note(it["close"], it["stop"]),
+                    notes=[n for n in [tape_note(tf) if tf else None, TR.describe(trend_by[sym]),
+                                       sizing_note(it["close"], it["stop"]),
                                        "T+2: mua hôm nay, sớm nhất bán chiều T+2"] if n],
                     unit="nghìn đ"))
                 sigs[-1]._base_low = it.get("base_low")
@@ -376,7 +404,7 @@ def main() -> int:
         keys.append(s.key)
 
     if watch_items and not seen(f"WATCH|vn|{expected}"):
-        blocks.append(watch_block(expected, watch_items, live_cfg))
+        blocks.append(watch_block(expected, watch_items, live_cfg, trend_by))
         keys.append(f"WATCH|vn|{expected}")
 
     if not args.weekly_only and tape_cov and not seen(f"TAPE|{expected}"):

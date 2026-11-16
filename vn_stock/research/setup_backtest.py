@@ -26,6 +26,7 @@ from vn_stock import DATA_DIR
 from vn_stock.setups import base_breakout as B
 from vn_stock.setups import divergence as V
 from vn_stock.setups import features as F
+from vn_stock.setups import trend as TR
 from vn_stock.setups.exits import ExitParams, Position, init_target, step
 from vn_stock.setups.sizing import CAP_PER_NAME, MAX_POSITIONS, RISK_PER_TRADE
 from vn_stock.strategies.macd_rsi import MACDRSIParams, precompute_macd_rsi
@@ -53,20 +54,24 @@ class Config:
     params: Tuple[Tuple[str, object], ...]
     exit: ExitParams
     regime_filter: bool = False
+    trend: str = "none"             # bộ lọc xu hướng EMA/dải tuần (setups/trend.py): none | ema200 | band | full
 
     @property
     def id(self) -> str:
-        raw = json.dumps([self.setup, list(self.params), self.exit.to_dict(), self.regime_filter], sort_keys=True,
-                         default=str)
+        key = [self.setup, list(self.params), self.exit.to_dict(), self.regime_filter]
+        if self.trend != "none":  # giữ nguyên id của các cấu hình cũ (không lọc xu hướng)
+            key.append(self.trend)
+        raw = json.dumps(key, sort_keys=True, default=str)
         return f"{self.setup}-{hashlib.sha1(raw.encode()).hexdigest()[:8]}"
 
     def to_dict(self) -> Dict:
         return {"id": self.id, "setup": self.setup, "params": dict(self.params), "exit": self.exit.to_dict(),
-                "regime_filter": self.regime_filter}
+                "regime_filter": self.regime_filter, "trend": self.trend}
 
 
 def config_from_dict(d: Dict) -> Config:
-    return Config(d["setup"], tuple(sorted(d["params"].items())), ExitParams(**d["exit"]), d.get("regime_filter", False))
+    return Config(d["setup"], tuple(sorted(d["params"].items())), ExitParams(**d["exit"]), d.get("regime_filter", False),
+                  d.get("trend", "none"))
 
 
 # ---------------------------------------------------------------- signals
@@ -105,6 +110,8 @@ def signals(cfg: Config, df: pd.DataFrame, feats: pd.DataFrame) -> pd.DataFrame:
     else:
         raise ValueError(cfg.setup)
     out["entry"] = out["entry"].fillna(False).astype(bool)
+    if cfg.trend != "none":
+        out["entry"] &= TR.passes(TR.trend_frame(df), cfg.trend).to_numpy()
     return out
 
 
@@ -349,19 +356,24 @@ EXIT_A = ExitParams(mode="A", tp_r=2.0, time_stop=20)
 EXIT_B = ExitParams(mode="B", time_stop=40)
 
 
+TREND_GRID = ("none", "full")
+
+
 def grid() -> List[Config]:
     cfgs: List[Config] = []
     for prof in (BASE_STRICT, BASE_RELAXED):
         for rv in (1.5, 2.0):
             for ex in (EXIT_A, EXIT_B):
                 for reg in (False, True):
-                    prm = dict(prof, rvol_min=rv)
-                    cfgs.append(Config("base_breakout", tuple(sorted(prm.items())), ex, reg))
+                    for tr in TREND_GRID:
+                        prm = dict(prof, rvol_min=rv)
+                        cfgs.append(Config("base_breakout", tuple(sorted(prm.items())), ex, reg, tr))
     for trig in ("immediate", "confirm"):
         for s200 in (True, False):
             for ex in (ExitParams(mode="A", tp_r=2.0, time_stop=15, use_bear_div=True),
                        ExitParams(mode="B", time_stop=40, use_bear_div=True)):
-                cfgs.append(Config("div_bull", (("require_sma200", s200), ("trigger", trig)), ex, False))
+                for tr in TREND_GRID:
+                    cfgs.append(Config("div_bull", (("require_sma200", s200), ("trigger", trig)), ex, False, tr))
     return cfgs
 
 
@@ -370,6 +382,18 @@ BENCHMARK = Config("macd_rsi_atr", (), ExitParams(mode="A", tp_r=2.5 / 1.5, time
 # macd_signed như bot live: chỉ MUA, SL swing+ATR, TP 2R (tuyệt đối từ tín hiệu), thoát khi hist MACD cắt xuống 0
 BENCHMARK_SIGNED = Config("macd_signed", (("allow_short", False),),
                           ExitParams(mode="A", time_stop=30, use_breakdown=False, use_signal_exit=True), False)
+# Cùng hai chiến lược live, thêm bộ lọc xu hướng đầy đủ (EMA50/200 + dải tuần) — chọn giữa bản gốc và bản lọc
+# chỉ bằng validate (pick_legacy), không nhìn ngoài mẫu.
+BENCHMARK_TREND = Config(BENCHMARK.setup, BENCHMARK.params, BENCHMARK.exit, False, "full")
+BENCHMARK_SIGNED_TREND = Config(BENCHMARK_SIGNED.setup, BENCHMARK_SIGNED.params, BENCHMARK_SIGNED.exit, False, "full")
+
+
+def pick_legacy(results: Dict[str, Dict], base: Config, filtered: Config, min_validate: int = 30) -> Config:
+    """Bản lọc xu hướng chỉ thay bản gốc khi validate PF cao hơn và đủ lệnh validate."""
+    rb, rf = results[base.id]["validate"], results[filtered.id]["validate"]
+    if rf.get("n", 0) >= min_validate and (rf.get("pf") or 0) > (rb.get("pf") or 0):
+        return filtered
+    return base
 
 
 def run_config(cfg: Config, data: Dict[str, pd.DataFrame], feats: Dict[str, pd.DataFrame], costs: Dict[str, float],
@@ -403,7 +427,9 @@ def select(results: Dict[str, Dict], configs: Dict[str, Config], setup: str, min
 
 
 def _differs_by_one(a: Config, b: Config) -> bool:
-    da = {**dict(a.params), **{f"exit_{k}": v for k, v in a.exit.to_dict().items()}, "regime": a.regime_filter}
-    db = {**dict(b.params), **{f"exit_{k}": v for k, v in b.exit.to_dict().items()}, "regime": b.regime_filter}
+    da = {**dict(a.params), **{f"exit_{k}": v for k, v in a.exit.to_dict().items()}, "regime": a.regime_filter,
+          "trend": a.trend}
+    db = {**dict(b.params), **{f"exit_{k}": v for k, v in b.exit.to_dict().items()}, "regime": b.regime_filter,
+          "trend": b.trend}
     keys = set(da) | set(db)
     return sum(1 for k in keys if da.get(k) != db.get(k)) <= 2  # exit A↔B đổi 2 trường (mode, time_stop)

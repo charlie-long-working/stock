@@ -71,8 +71,8 @@ def main() -> int:
     print(f"Dữ liệu: {len(data)} mã · chi phí {costs}")
 
     configs = {c.id: c for c in S.grid()}
-    configs[S.BENCHMARK.id] = S.BENCHMARK
-    configs[S.BENCHMARK_SIGNED.id] = S.BENCHMARK_SIGNED
+    for b in (S.BENCHMARK, S.BENCHMARK_SIGNED, S.BENCHMARK_TREND, S.BENCHMARK_SIGNED_TREND):
+        configs[b.id] = b
     trades, results = {}, {}
     for k, cfg in configs.items():
         tr = S.run_config(cfg, data, feats, costs, bearish, idx_close)
@@ -90,8 +90,8 @@ def main() -> int:
             fallback = True
         if sel:
             chosen[setup] = (sel, fallback)
-    chosen["macd_rsi_atr"] = (S.BENCHMARK.id, False)
-    chosen["macd_signed"] = (S.BENCHMARK_SIGNED.id, False)
+    chosen["macd_rsi_atr"] = (S.pick_legacy(results, S.BENCHMARK, S.BENCHMARK_TREND).id, False)
+    chosen["macd_signed"] = (S.pick_legacy(results, S.BENCHMARK_SIGNED, S.BENCHMARK_SIGNED_TREND).id, False)
 
     verdicts = {}
     for setup, (k, fallback) in chosen.items():
@@ -107,7 +107,9 @@ def main() -> int:
         if fallback and g["verdict"] == "ship":
             g["verdict"] = "watch"
             g["note"] = "không cấu hình nào qua bước chọn train/validate"
-        g["selected_by"] = ("đối chứng — cấu hình đang chạy live" if setup in ("macd_rsi_atr", "macd_signed")
+        g["selected_by"] = (("đối chứng — cấu hình live" + (" + lọc xu hướng (validate PF cao hơn)" if cfg.trend != "none"
+                                                              else ""))
+                            if setup in ("macd_rsi_atr", "macd_signed")
                             else "dự phòng: không cấu hình nào qua bước chọn train/validate" if fallback
                             else "train/validate")
         g["config"] = cfg.to_dict()
@@ -123,7 +125,7 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     pd.concat([t for t in trades.values() if len(t)], ignore_index=True).to_csv(out / "trades.csv", index=False)
     summary = {"generated_at": datetime.now().isoformat(timespec="seconds"), "symbols": len(data), "costs": costs,
-               "configs_tested": len(configs) - 2, "periods": {"train_end": S.TRAIN_END, "oos_start": S.OOS_START},
+               "configs_tested": len(configs) - 4, "periods": {"train_end": S.TRAIN_END, "oos_start": S.OOS_START},
                "gates": S.GATES, "grid": {k: {**configs[k].to_dict(), **results[k]} for k in configs},
                "verdicts": verdicts, "runtime_s": round(time.time() - t0, 1)}
     (out / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=str), encoding="utf-8")

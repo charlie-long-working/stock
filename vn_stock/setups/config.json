@@ -1,11 +1,11 @@
 {
- "frozen_at": "2026-11-15T22:24:04",
- "source": "data/research/setups_20261115_2224",
+ "frozen_at": "2026-11-16T22:21:43",
+ "source": "data/research/setups_20261116_2221",
  "setups": {
   "base_breakout": {
    "verdict": "watch",
    "config": {
-    "id": "base_breakout-c9943385",
+    "id": "base_breakout-236fc358",
     "setup": "base_breakout",
     "params": {
      "bbw_rank_max": 0.6,
@@ -38,17 +38,18 @@
      "use_bear_div": false,
      "use_signal_exit": false
     },
-    "regime_filter": false
+    "regime_filter": false,
+    "trend": "full"
    },
-   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 139 lệnh, win 31%, PF 1.05, TB +0.16%/lệnh — WATCH"
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 135 lệnh, win 31%, PF 1.07, TB +0.24%/lệnh — WATCH"
   },
   "div_bull": {
-   "verdict": "off",
+   "verdict": "watch",
    "config": {
-    "id": "div_bull-c21306f7",
+    "id": "div_bull-8bc79576",
     "setup": "div_bull",
     "params": {
-     "require_sma200": true,
+     "require_sma200": false,
      "trigger": "immediate"
     },
     "exit": {
@@ -61,9 +62,10 @@
      "use_bear_div": true,
      "use_signal_exit": false
     },
-    "regime_filter": false
+    "regime_filter": false,
+    "trend": "full"
    },
-   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 109 lệnh, win 25%, PF 0.74, TB -0.90%/lệnh — OFF"
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 33 lệnh, win 27%, PF 1.80, TB +1.83%/lệnh — WATCH"
   },
   "macd_rsi_atr": {
    "verdict": "off",
@@ -81,9 +83,10 @@
      "use_bear_div": false,
      "use_signal_exit": true
     },
-    "regime_filter": false
+    "regime_filter": false,
+    "trend": "none"
    },
-   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 2235 lệnh, win 33%, PF 0.78, TB -0.63%/lệnh — OFF"
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 2240 lệnh, win 33%, PF 0.78, TB -0.64%/lệnh — OFF"
   },
   "macd_signed": {
    "verdict": "off",
@@ -103,9 +106,10 @@
      "use_bear_div": false,
      "use_signal_exit": true
     },
-    "regime_filter": false
+    "regime_filter": false,
+    "trend": "none"
    },
-   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 1344 lệnh, win 30%, PF 0.72, TB -0.80%/lệnh — OFF"
+   "evidence": "ngoài mẫu 2024+ (sau phí, T+2): 1346 lệnh, win 30%, PF 0.72, TB -0.81%/lệnh — OFF"
   }
  }
 }

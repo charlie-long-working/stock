@@ -4,6 +4,7 @@
 verdict ship  → Signal MUA (entry tham chiếu = close, SL/TP theo cấu hình) + vào sổ lệnh giấy
 verdict watch → mục "Theo dõi" (không có mức giá vào lệnh, không vào sổ)
 verdict off   → bỏ qua
+Cấu hình có `trend` ≠ none (setups/trend.py) → chỉ báo khi nến cuối đạt bộ lọc xu hướng EMA50/200 + dải tuần.
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ import pandas as pd
 
 from vn_stock.setups import base_breakout as B
 from vn_stock.setups import divergence as V
+from vn_stock.setups import trend as TR
 from vn_stock.setups.exits import ExitParams
 from vn_stock.setups.features import add_common
 from vn_stock.strategies.macd_rsi import precompute_macd_rsi
@@ -52,6 +54,15 @@ def evidence(setup: str, live_cfg: Dict) -> Optional[str]:
     return (live_cfg.get(setup) or {}).get("evidence")
 
 
+def trend_mode(strategy: str, live_cfg: Dict) -> str:
+    return ((live_cfg.get(strategy) or {}).get("config") or {}).get("trend", "none") or "none"
+
+
+def trend_ok(strategy: str, live_cfg: Dict, tf: pd.DataFrame) -> bool:
+    """Nến cuối có qua bộ lọc xu hướng mà cấu hình đã khoá của chiến lược yêu cầu không."""
+    return bool(TR.passes(tf, trend_mode(strategy, live_cfg)).iloc[-1])
+
+
 def _params(cfg: Dict) -> Dict:
     p = dict(cfg.get("params", {}))
     if "max_height" in p:
@@ -59,13 +70,14 @@ def _params(cfg: Dict) -> Dict:
     return p
 
 
-def scan_setups(sym: str, df: pd.DataFrame, live_cfg: Dict, feats: Optional[pd.DataFrame] = None
-                ) -> Tuple[List[Dict], List[Dict]]:
+def scan_setups(sym: str, df: pd.DataFrame, live_cfg: Dict, feats: Optional[pd.DataFrame] = None,
+                tf: Optional[pd.DataFrame] = None) -> Tuple[List[Dict], List[Dict]]:
     """(ship, watch) cho nến cuối. Mỗi phần tử: setup, close, stop, target|None, base_low|None, note."""
     ship, watch = [], []
     if len(df) < 260 or not live_cfg:
         return ship, watch
     feats = feats if feats is not None else add_common(df)
+    tf = tf if tf is not None else TR.trend_frame(df)
     close = float(df["close"].iloc[-1])
     for setup, info in live_cfg.items():
         verdict = info.get("verdict")
@@ -89,6 +101,9 @@ def scan_setups(sym: str, df: pd.DataFrame, live_cfg: Dict, feats: Optional[pd.D
                 item = {"setup": setup, "close": close, "stop": float(last["stop"]), "base_low": None,
                         "note": f"phân kỳ dương MACD/RSI (đáy xác nhận 5 phiên trước), rủi ro {last['risk'] * 100:.1f}%"}
         if item is None:
+            continue
+        if not trend_ok(setup, live_cfg, tf):
+            print(f"  TREND-SKIP {setup} {sym}: ngược bộ lọc xu hướng {trend_mode(setup, live_cfg)}")
             continue
         ep = ExitParams(**cfg["exit"])
         item["target"] = item["close"] + ep.tp_r * (item["close"] - item["stop"]) if ep.mode == "A" else None
