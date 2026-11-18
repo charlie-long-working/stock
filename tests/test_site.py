@@ -30,9 +30,6 @@ class SiteTests(unittest.TestCase):
         self.assertIsNone(schedule.site_due(d.replace(hour=17), {"site": {"enabled": False}}))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class PublishTests(unittest.TestCase):
     def test_publish_orphan_commit_and_skip_unchanged(self):
@@ -63,3 +60,7 @@ class PublishTests(unittest.TestCase):
                                              "index.html", "publish.json"])
             body = subprocess.run(git + ["show", "gh-pages:index.html"], capture_output=True, text=True).stdout
             self.assertEqual(body, "<html>v2</html>")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -7,7 +7,8 @@ python -m brief publish [--force] [--dry-run]
   dù trang ~2.5 MB dựng 2 lần/ngày.
 - Bỏ qua nếu index.html không đổi so với lần đẩy trước (trừ --force).
 - Workflow deploy (brief/pages_workflow.yml) được chép kèm vào nhánh, nên push là đủ để kích hoạt CI.
-- Trang phụ ([site] extra_pages) được chép thành <đường dẫn>/index.html; đổi nội dung trang phụ cũng tính là thay đổi.
+- Trang phụ ([site] extra_pages) và báo cáo ([[site.reports]] → reports/<key>/) được chép thành <đường dẫn>/index.html;
+  đổi nội dung chúng cũng tính là thay đổi.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from brief import db
+from brief import db, reports
 from brief.config import DB_PATH, ROOT, VAR, load_settings
 from brief.site import OUT_DIR
 
@@ -51,32 +52,13 @@ def config(settings: Optional[dict] = None) -> Dict[str, Any]:
             "remote": sc.get("publish_remote", ""),
             "branch": sc.get("publish_branch", "gh-pages"),
             "url": sc.get("page_url", ""),
-            "extra_pages": dict(sc.get("extra_pages") or {})}
-
-
-def _as_document(html: bytes) -> bytes:
-    """Trang nguồn kiểu artifact (không có <!doctype>/<head>) → bọc thành tài liệu HTML đầy đủ."""
-    if html.lstrip()[:15].lower().startswith(b"<!doctype"):
-        return html
-    return (b'<!doctype html>\n<html lang="vi">\n<head>\n<meta charset="utf-8">\n'
-            b'<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-            b"</head>\n<body>\n" + html + b"\n</body>\n</html>\n")
+            "extra_pages": dict(sc.get("extra_pages") or {}),
+            "reports": list(sc.get("reports") or [])}
 
 
 def extra_pages(cfg: Dict[str, Any], base: Path = ROOT) -> tuple[Dict[str, bytes], Dict[str, str]]:
-    """Đọc trang phụ: {đường dẫn: nội dung}, {đường dẫn: lỗi}. Đường dẫn chỉ gồm các đoạn an toàn."""
-    pages: Dict[str, bytes] = {}
-    errors: Dict[str, str] = {}
-    for key, src in sorted(cfg.get("extra_pages", {}).items()):
-        parts = [p for p in str(key).strip("/").split("/") if p]
-        if not parts or any(p in (".", "..", ".github") or p.startswith(".") for p in parts):
-            errors[key] = "đường dẫn không hợp lệ"
-            continue
-        f = (base / src).resolve()
-        if not f.is_file():
-            errors[key] = f"không thấy {f}"
-            continue
-        pages["/".join(parts)] = _as_document(f.read_bytes())
+    """Trang phụ + báo cáo nghiên cứu: {đường dẫn: HTML đã chuẩn bị}, {đường dẫn/key: lỗi} (xem brief/reports.py)."""
+    pages, errors, _ = reports.load(cfg, base)
     return pages, errors
 
 
@@ -113,10 +95,7 @@ def publish(force: bool = False, dry_run: bool = False, settings: Optional[dict]
         if f.name != ".git":
             shutil.rmtree(f) if f.is_dir() else f.unlink()
     (repo_dir / "index.html").write_bytes(html)
-    for key, body in pages.items():
-        out = repo_dir / key / "index.html"
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_bytes(body)
+    reports.write(repo_dir, pages)
     (repo_dir / ".nojekyll").write_text("")
     (repo_dir / "README.md").write_text(README, encoding="utf-8")
     (repo_dir / "publish.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")

@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bảng tin thị trường</title>
+<meta name="description" content="Bảng tin thị trường tự động: tin tức 24 giờ, BTC/ETH, chứng khoán Việt Nam theo ngành, top 100 cổ phiếu, vàng & bạc và các nghiên cứu vĩ mô. Không phải khuyến nghị đầu tư.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:title" content="Bảng tin thị trường">
+<meta property="og:description" content="Tin 24 giờ, crypto, chứng khoán VN, vàng bạc và nghiên cứu vĩ mô (M2, vàng, dầu, S&P 500). Cập nhật 2 lần/ngày.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%93%88%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
@@ -32,11 +39,18 @@ h3{font-size:14px;margin:0 0 8px;color:var(--muted);font-weight:600;text-transfo
 nav{display:flex;gap:4px;flex-wrap:wrap;max-width:1400px;margin:12px auto 0;padding:0 16px;border-bottom:1px solid var(--line)}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}
 nav button.on{color:var(--accent);border-color:var(--accent)}
+nav button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+@media (max-width:900px){
+  nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:0 8px}
+  nav::-webkit-scrollbar{display:none}
+  nav button{white-space:nowrap;padding:10px 10px;flex:0 0 auto}
+}
 main{max-width:1400px;margin:0 auto;padding:16px}
 .tab{display:none}.tab.on{display:block}
 .grid{display:grid;gap:12px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.split{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+@media (max-width:900px){.g2,.g3,.g4,.split{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
 .kpi .v{font-size:22px;font-weight:700}.kpi .l{color:var(--muted);font-size:12px}
 .up{color:var(--up)}.down{color:var(--down)}.muted{color:var(--muted)}.warn{color:var(--warn)}
@@ -65,6 +79,19 @@ select,input[type=search]{background:var(--panel);color:var(--text);border:1px s
 .err{color:var(--down);font-size:12px}
 footer{max-width:1400px;margin:0 auto;padding:8px 16px 32px;color:var(--muted);font-size:12px}
 .pill{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:6px}
+.fresh{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin:0 0 10px}
+.fresh .dot{width:8px;height:8px;border-radius:50%;background:var(--up);flex:0 0 auto}
+.fresh.old{color:var(--warn)}.fresh.old .dot{background:var(--warn)}
+.reps{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));margin-bottom:10px}
+@media (max-width:600px){.reps{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:80%;overflow-x:auto;scroll-snap-type:x mandatory}.rep{scroll-snap-align:start}}
+.rep{display:block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);text-decoration:none}
+.rep b{display:block;margin-bottom:2px}.rep:hover{border-color:var(--accent)}
+.rep.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.rep.on b{color:var(--accent)}
+.rep.dis{opacity:.6}
+.ai-text{white-space:pre-line;margin:8px 0;line-height:1.55;overflow-wrap:anywhere}
+.ai-brief{border-left:3px solid var(--accent)}
+.rep-frame{display:block;width:100%;height:80vh;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+a{color:var(--accent)}
 .bar{height:8px;background:var(--panel2);border-radius:4px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent)}
 </style>
 </head>
@@ -74,20 +101,23 @@ footer{max-width:1400px;margin:0 auto;padding:8px 16px 32px;color:var(--muted);f
   <div class="sub">Cập nhật <b id="gen"></b> · Dữ liệu công khai, tự động tổng hợp · <b>Không phải khuyến nghị đầu tư cá nhân hoá, không đặt lệnh</b>
     <button id="theme" class="pill" style="cursor:pointer;background:none">◐ giao diện</button></div>
 </header>
-<nav id="tabs">
-  <button data-t="news" class="on">📰 Tin tức hằng ngày</button>
-  <button data-t="crypto">₿ BTC / ETH</button>
-  <button data-t="sector">🏭 Chứng khoán theo ngành</button>
-  <button data-t="top">📊 Top 100 cổ phiếu</button>
-  <button data-t="metals">🥇 Vàng &amp; bạc</button>
+<nav id="tabs" role="tablist" aria-label="Các mục bảng tin">
+  <button role="tab" id="tb-news" aria-controls="tab-news" data-t="news" class="on">📰 Tin tức hằng ngày</button>
+  <button role="tab" id="tb-crypto" aria-controls="tab-crypto" data-t="crypto">₿ BTC / ETH</button>
+  <button role="tab" id="tb-sector" aria-controls="tab-sector" data-t="sector">🏭 Chứng khoán theo ngành</button>
+  <button role="tab" id="tb-top" aria-controls="tab-top" data-t="top">📊 Top 100 cổ phiếu</button>
+  <button role="tab" id="tb-metals" aria-controls="tab-metals" data-t="metals">🥇 Vàng &amp; bạc</button>
+  <button role="tab" id="tb-research" aria-controls="tab-research" data-t="research">🔬 Nghiên cứu</button>
 </nav>
 <main>
-  <section id="tab-news" class="tab on"></section>
-  <section id="tab-crypto" class="tab"></section>
-  <section id="tab-sector" class="tab"></section>
-  <section id="tab-top" class="tab"></section>
-  <section id="tab-metals" class="tab"></section>
+  <section id="tab-news" class="tab on" role="tabpanel" aria-labelledby="tb-news"></section>
+  <section id="tab-crypto" class="tab" role="tabpanel" aria-labelledby="tb-crypto"></section>
+  <section id="tab-sector" class="tab" role="tabpanel" aria-labelledby="tb-sector"></section>
+  <section id="tab-top" class="tab" role="tabpanel" aria-labelledby="tb-top"></section>
+  <section id="tab-metals" class="tab" role="tabpanel" aria-labelledby="tb-metals"></section>
+  <section id="tab-research" class="tab" role="tabpanel" aria-labelledby="tb-research"></section>
 </main>
+<noscript><p style="max-width:1400px;margin:0 auto;padding:16px">Trang cần JavaScript để hiển thị dữ liệu và biểu đồ.</p></noscript>
 <footer id="foot"></footer>
 <script id="data" type="application/json">/*__DATA__*/</script>
 <script>
@@ -104,22 +134,81 @@ const badge = r => r ? `<span class="badge ${RATING[r] || "r-h"}" title="${esc(r
 const RORDER = ["STRONG BUY","BUY","ACCUMULATE","HOLD","REDUCE","AVOID","INSUFFICIENT DATA"];
 const charts = {};
 
-// ---------- tabs & theme
+// ---------- tabs (hash #tab hoặc #research/<key>, nút back hoạt động), theme, độ tươi dữ liệu
 const built = {};
-function show(t) {
-  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+const lwcCharts = new Set();
+let curTab = null, curSub = "";
+// how: "push" (mặc định, thêm vào lịch sử) | "replace" | false (đang đi theo URL, không ghi lịch sử)
+function show(t, sub = "", how = "push") {
+  if (!BUILD[t]) { t = "news"; sub = ""; }
+  const nav = $("#tabs");
+  nav.querySelectorAll("[role=tab]").forEach(b => {
+    const on = b.dataset.t === t;
+    b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1;
+    if (on) nav.scrollLeft = b.offsetLeft - (nav.clientWidth - b.offsetWidth) / 2;   // thanh tab cuộn ngang trên điện thoại
+  });
   document.querySelectorAll(".tab").forEach(s => s.classList.toggle("on", s.id === "tab-" + t));
-  if (!built[t]) { built[t] = true; BUILD[t](); }
+  if (!built[t]) { built[t] = true; BUILD[t](); freshBadge(t); }
+  if (t === "research") sub = openReport(sub);
+  curTab = t; curSub = sub || "";
+  const h = "#" + t + (curSub ? "/" + curSub : "");
+  if (how && location.hash !== h) { try { history[how === "replace" ? "replaceState" : "pushState"](null, "", h); } catch (e) {} }
   try { localStorage.setItem("tab", t); } catch (e) {}
 }
+function route(how = false) {
+  const m = decodeURIComponent(location.hash.slice(1)).split("/");
+  if (m[0] && BUILD[m[0]]) { show(m[0], m.slice(1).join("/"), how); return true; }
+  return false;
+}
+addEventListener("popstate", () => route(false));
+addEventListener("hashchange", () => route(false));
 $("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(b.dataset.t); });
+$("#tabs").addEventListener("keydown", e => {
+  const bs = [...$("#tabs").querySelectorAll("[role=tab]")], i = bs.findIndex(b => b.dataset.t === curTab);
+  const j = {ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: bs.length - 1}[e.key];
+  if (j == null) return;
+  e.preventDefault();
+  const b = bs[(j + bs.length) % bs.length]; show(b.dataset.t); b.focus();
+});
+const themeNow = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+function postTheme() {
+  const f = document.getElementById("rep-frame");
+  if (f && f.contentWindow) f.contentWindow.postMessage({type: "theme", theme: themeNow()}, "*");
+}
 $("#theme").addEventListener("click", () => {
-  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = themeNow() === "dark" ? "light" : "dark";
   try { localStorage.setItem("theme", document.documentElement.dataset.theme); } catch (e) {}
-  location.reload();
+  // biểu đồ đọc màu lúc tạo → huỷ và dựng lại các tab đã mở (không reload trang); tab Nghiên cứu chỉ đổi theme trong iframe
+  Object.keys(charts).forEach(k => { try { charts[k].destroy(); } catch (e) {} delete charts[k]; });
+  lwcCharts.forEach(c => { try { c.remove(); } catch (e) {} }); lwcCharts.clear();
+  Object.keys(built).forEach(k => { if (k !== "research") { delete built[k]; $("#tab-" + k).innerHTML = ""; } });
+  show(curTab, curSub, false);
+  postTheme();
 });
 try { const th = localStorage.getItem("theme"); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+
+const fmtTime = iso => {
+  const d = new Date(iso);
+  if (isNaN(d)) return "–";
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23"})
+    .formatToParts(d).map(x => [x.type, x.value]));
+  return `${p.day}/${p.month} ${p.hour}:${p.minute}`;
+};
+const agoTxt = h => h < 1 ? "vừa xong" : h < 48 ? `${Math.round(h)} giờ trước` : `${Math.round(h / 24)} ngày trước`;
+const FRESH = {news: ["news", "Tin"], crypto: ["crypto", "Crypto"], sector: ["vn", "Chứng khoán"], top: ["vn", "Chứng khoán"], metals: ["metals", "Vàng/bạc"]};
+function freshBadge(t) {
+  const f = FRESH[t], sec = f && D[f[0]];
+  if (!sec) return;
+  const at = sec._built_at || D.generated_iso, h = (Date.now() - Date.parse(at)) / 36e5;
+  const extra = [];
+  if (f[0] === "crypto" && sec.generated_at) extra.push("snapshot " + fmtTime(sec.generated_at));
+  if (f[0] === "vn" && /^\d{8}_\d{4}/.test(sec.scan_id || "")) { const s = sec.scan_id; extra.push(`lượt quét ${s.slice(6, 8)}/${s.slice(4, 6)} ${s.slice(9, 11)}:${s.slice(11, 13)}`); }
+  if (f[0] === "metals" && sec.assets) extra.push("giá đóng cửa " + Object.values(sec.assets).map(a => a.as_of).filter(Boolean).sort().slice(-1)[0]);
+  const old = !!sec._stale || h > 36;
+  const warn = sec._stale ? ` · <b>đang dùng bản cũ</b> (lần dựng mới lỗi: ${esc(String(sec._stale).slice(0, 120))})` : h > 36 ? " · <b>dữ liệu đã cũ</b>" : "";
+  $("#tab-" + t).insertAdjacentHTML("afterbegin",
+    `<div class="fresh${old ? " old" : ""}" role="status"><i class="dot"></i>Dữ liệu ${f[1]}: ${fmtTime(at)} (${agoTxt(h)})${extra.length ? " · " + esc(extra.join(" · ")) : ""}${warn}</div>`);
+}
 
 // ---------- chart helpers
 function cjs(id, cfg) {
@@ -134,6 +223,7 @@ function cjs(id, cfg) {
 const PAL = () => [css("--s1"), css("--s2"), css("--s3"), css("--s4"), css("--s5"), css("--s6")];
 
 function candle(el, ch, opts = {}) {
+  if (el._lwc) { try { el._lwc.remove(); } catch (e) {} lwcCharts.delete(el._lwc); el._lwc = null; }
   el.innerHTML = "";
   if (!window.LightweightCharts) { el.innerHTML = '<div class="err">Không tải được thư viện biểu đồ (cần internet)</div>'; return; }
   if (!ch || !ch.t || !ch.t.length) { el.innerHTML = '<div class="muted">Không có dữ liệu giá</div>'; return; }
@@ -163,6 +253,7 @@ function candle(el, ch, opts = {}) {
     s.createPriceLine({price: pl.price, color: pl.color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: pl.title});
   }
   c.timeScale().fitContent();
+  el._lwc = c; lwcCharts.add(c);
   return c;
 }
 const legend = () => `<div class="note">Nến ngày · <span style="color:${css("--s2")}">EMA20</span> · <span style="color:${css("--s1")}">SMA50</span> · <span style="color:${css("--s5")}">SMA200</span> · <span style="color:${css("--s3")}">Senkou A</span>/<span style="color:${css("--s4")}">Senkou B</span> (mây Ichimoku, nét đứt) · khối lượng phía dưới</div>`;
@@ -201,20 +292,42 @@ function table(el, cols, rows, opts = {}) {
 function errBox(sec) { return sec && sec.error ? `<div class="card err">Lỗi phần này: ${esc(sec.error)}</div>` : ""; }
 function listHtml(arr) { return arr && arr.length ? `<ul class="lst">${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : '<span class="muted">–</span>'; }
 
+// HTML kiểu Telegram (<b>, <i>, <a href>) → chỉ giữ đúng các thẻ đó, link http(s); còn lại thành chữ thường
+function safeHtml(src) {
+  const doc = new DOMParser().parseFromString(`<div>${src || ""}</div>`, "text/html");
+  const walk = n => [...n.childNodes].map(c => {
+    if (c.nodeType === 3) return esc(c.textContent);
+    if (c.nodeType !== 1) return "";
+    const tag = c.tagName.toLowerCase();
+    if (["script", "style", "template", "iframe", "object"].includes(tag)) return "";
+    const inner = walk(c);
+    if (["b", "strong"].includes(tag)) return `<b>${inner}</b>`;
+    if (["i", "em"].includes(tag)) return `<i>${inner}</i>`;
+    if (tag === "a" && /^https?:\/\//i.test(c.getAttribute("href") || "")) return `<a href="${esc(c.getAttribute("href"))}" target="_blank" rel="noopener">${inner}</a>`;
+    return tag === "br" ? "\n" : inner;
+  }).join("");
+  return walk(doc.body.firstChild);
+}
+
 // ================= TIN TỨC
 const BUILD = {};
 BUILD.news = () => {
   const N = D.news, el = $("#tab-news");
   if (!N || N.error) { el.innerHTML = errBox(N || {error: "không có dữ liệu"}); return; }
   const secs = Object.keys(N.by_section);
-  el.innerHTML = `
+  const A = N.ai_brief;
+  const ai = A && A.html ? `<div class="card ai-brief" style="margin-bottom:12px"><div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">🤖 Tóm tắt AI</h2><span class="note">${esc(A.at_vn || fmtTime(A.at))}${A.n_items ? ` · ${esc(A.n_items)} tin` : ""}</span></div>
+    <div class="ai-text">${safeHtml(A.html)}</div>
+    <div class="note">AI tổng hợp, đã kiểm nguồn &amp; số liệu${A.model ? ` (${esc(A.model)})` : ""}. Bấm link để đọc bài gốc.</div></div>` : "";
+  el.innerHTML = `${ai}
   <div class="grid g4" style="margin-bottom:12px">
     <div class="card kpi"><div class="l">Cụm tin (đã lọc trùng)</div><div class="v">${N.items.length}</div></div>
     <div class="card kpi"><div class="l">Bài gốc 24 giờ</div><div class="v">${nf(N.raw_items_24h)}</div></div>
     <div class="card kpi"><div class="l">Nguồn hoạt động</div><div class="v">${Object.values(N.sources_status).filter(x => x === "ok").length}/${Object.keys(N.sources_status).length}</div></div>
     <div class="card kpi"><div class="l">Khoảng tin</div><div class="v" style="font-size:14px">${esc(N.window[0])} → ${esc(N.window[1])}</div></div>
   </div>
-  <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">
+  <div class="grid split">
     <div class="card"><h2>Tin nổi bật 24 giờ</h2>
       <div class="row" id="news-chips"><span class="chip on" data-s="">Tất cả</span>${secs.map(s => `<span class="chip" data-s="${esc(s)}">${esc(s)} (${N.by_section[s]})</span>`).join("")}</div>
       <div id="news-list"></div>
@@ -515,7 +628,7 @@ function openStock(sym) {
         <div class="note">${esc(s.lv?.preferred_basis || "")}</div></div>
       <div class="card kpi"><div class="l">Mục tiêu 1 / 2 · R:R</div><div class="v" style="font-size:16px">${nf(s.lv?.target1)} / ${nf(s.lv?.target2)} · ${nf(s.lv?.risk_reward_t1, 2)}</div>
         <div class="note">${esc(s.lv?.target1_basis || "")}</div></div></div>
-    <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">
+    <div class="grid split">
       <div><div id="st-chart" class="chart"></div>${legend()}</div>
       <div class="card"><h3>Chỉ số chính · BCTC ${esc(s.fa_period || "")}</h3><div class="kv">
         <div>P/E · P/B</div><div>${nf(s.pe, 1)} · ${nf(s.pb, 2)}</div><div>EPS · BVPS</div><div>${nf(s.eps)} · ${nf(s.bvps)}</div>
@@ -585,6 +698,49 @@ BUILD.metals = () => {
     options: {maintainAspectRatio: false, scales: {y: {min: 0, max: 100}, x: {ticks: {maxTicksLimit: 6}}}}});
 };
 
+// ================= NGHIÊN CỨU (trang tĩnh reports/<key>/, nhúng iframe; shim trong trang báo cáo gửi chiều cao)
+BUILD.research = () => {
+  const R = D.reports || [], el = $("#tab-research");
+  if (!R.length) { el.innerHTML = '<div class="card muted">Chưa có báo cáo nghiên cứu.</div>'; return; }
+  el.innerHTML = `<div class="reps">${R.map(r => `<a class="rep${r.error ? " dis" : ""}" href="#research/${esc(r.key)}" data-k="${esc(r.key)}">
+      <b>${esc(r.title)}</b><span class="note">${esc(r.date || "")}${r.note ? " · " + esc(r.note) : ""}${r.error ? " · " + esc(r.error) : ""}</span></a>`).join("")}</div>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="note">Nghiên cứu mô tả mẫu lịch sử, không phải khuyến nghị đầu tư.</span>
+      <a id="rep-open" target="_blank" rel="noopener">Mở trang riêng ↗</a></div>
+    <div id="rep-msg"></div>
+    <iframe id="rep-frame" class="rep-frame" title="Báo cáo nghiên cứu"></iframe>`;
+  el.querySelectorAll(".rep").forEach(a => a.addEventListener("click", ev => { ev.preventDefault(); show("research", a.dataset.k); }));
+};
+function openReport(k) {
+  const R = D.reports || [];
+  const r = R.find(x => x.key === k) || R.find(x => !x.error) || R[0];
+  if (!r) return "";
+  document.querySelectorAll("#tab-research .rep").forEach(a => {
+    const on = a.dataset.k === r.key;
+    a.classList.toggle("on", on); a.setAttribute("aria-current", on ? "page" : "false");
+    if (on) a.parentElement.scrollLeft = a.offsetLeft - a.parentElement.offsetLeft;   // hàng thẻ cuộn ngang trên điện thoại
+  });
+  const f = $("#rep-frame"), msg = $("#rep-msg");
+  const url = r.path + (r.v ? "?v=" + encodeURIComponent(r.v) : "");
+  $("#rep-open").href = url;
+  msg.innerHTML = r.error ? `<div class="card err">Báo cáo “${esc(r.title)}” chưa có trang (${esc(r.error)}).</div>` : "";
+  f.style.display = r.error ? "none" : "block";
+  if (!r.error && f.dataset.k !== r.key) {
+    // iframe mới cho mỗi báo cáo: đổi src của iframe cũ sẽ thêm mục vào lịch sử, nút back lùi trong iframe thay vì đổi báo cáo
+    const nf_ = document.createElement("iframe");
+    nf_.id = "rep-frame"; nf_.className = "rep-frame"; nf_.title = r.title; nf_.dataset.k = r.key;
+    nf_.addEventListener("load", postTheme);
+    nf_.src = url;
+    f.replaceWith(nf_);
+  }
+  return r.key;
+}
+addEventListener("message", e => {
+  const f = document.getElementById("rep-frame"), d = e.data || {};
+  if (!f || e.source !== f.contentWindow) return;
+  if (d.type === "report-h" && d.h > 0) f.style.height = Math.max(400, Math.min(d.h, 60000)) + "px";
+  if (d.type === "report-ready") postTheme();
+});
+
 // ---------- footer & init
 $("#gen").textContent = D.generated_at;
 const errs = Object.entries(D.errors || {});
@@ -592,9 +748,11 @@ $("#foot").innerHTML = `<b>Nguồn dữ liệu.</b> Tin: RSS các báo (daily-br
   Vàng/bạc: Yahoo GC=F/SI=F, Vietcombank. Open Interest chỉ có cho phái sinh crypto; cổ phiếu VN không có OI.
   ${errs.length ? `<div class="err">Lỗi khi tạo trang: ${errs.map(([k, v]) => esc(k + ": " + v)).join("; ")}</div>` : ""}
   <div style="margin-top:6px">Mọi xếp hạng là kết quả mô hình tự động, có thể sai; giá trị nội tại là ước tính có giả định. Không phải lời khuyên đầu tư.</div>`;
-let start = "news";
-try { start = localStorage.getItem("tab") || "news"; } catch (e) {}
-show(BUILD[start] ? start : "news");
+if (!route("replace")) {
+  let start = "news";
+  try { start = localStorage.getItem("tab") || "news"; } catch (e) {}
+  show(BUILD[start] ? start : "news", "", "replace");
+}
 </script>
 </body>
 </html>

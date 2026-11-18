@@ -87,6 +87,28 @@ def _norm(c: List[Optional[float]]) -> List[Optional[float]]:
 
 
 # ---------------------------------------------------------------- tin tức
+def latest_ai_brief(path: Path = DB_PATH, hours: int = 30) -> Optional[Dict[str, Any]]:
+    """Bản tin AI gần nhất (đã qua validate, HTML chỉ còn <b>/<i>/<a href>) để hiện ở đầu tab Tin."""
+    cut = db.iso(db.now_utc() - timedelta(hours=hours))
+    with db.connect(path) as con:
+        rows = con.execute("SELECT created_at, text_html, n_items, meta FROM briefs WHERE kind='news' AND mode='ai' "
+                           "AND status IN ('built','sent','partial') AND created_at >= ? ORDER BY id DESC LIMIT 5",
+                           (cut,)).fetchall()
+    r = meta = None
+    for row in rows:                       # chỉ bản bot tự tạo (runs/<ngày>/bot-*), không lấy bản soạn tay thử nghiệm
+        try:
+            m = json.loads(row["meta"] or "{}")
+        except ValueError:
+            continue
+        if "/bot-" in str(m.get("run_dir", "")):
+            r, meta = row, m
+            break
+    if not r:
+        return None
+    return {"html": r["text_html"], "at": r["created_at"], "at_vn": compose.fmt_local(db.parse_iso(r["created_at"])),
+            "n_items": r["n_items"], "model": (meta.get("usage") or {}).get("model")}
+
+
 def news_section(path: Path = DB_PATH, hours: int = 24) -> Dict[str, Any]:
     s = load_settings()
     summary = news.collect(path=path)
@@ -114,6 +136,7 @@ def news_section(path: Path = DB_PATH, hours: int = 24) -> Dict[str, Any]:
     return {"window": [compose.fmt_local(start), compose.fmt_local(end)], "items": items,
             "by_section": by_sec, "by_source": dict(sorted(by_src.items(), key=lambda x: -x[1])[:15]),
             "raw_items_24h": n24,
+            "ai_brief": latest_ai_brief(path),
             "sources_status": {k: v["status"] for k, v in summary.items()},
             "note": "Cụm tin đã lọc trùng (URL + tiêu đề), xếp theo độ ưu tiên nguồn, số nguồn cùng đưa, từ khoá, độ mới"}
 

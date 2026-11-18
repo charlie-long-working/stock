@@ -40,9 +40,30 @@ publish = true
 publish_remote = "git@github-charlie:charlie-long-working/stock.git"
 publish_branch = "gh-pages"
 page_url = "https://charlie-long-working.github.io/stock/"
-# Trang phụ tĩnh đẩy kèm mỗi lần publish: "đường dẫn trên Pages" = "file HTML nguồn" (tương đối thư mục daily-brief).
-# Thiếu file nguồn → bỏ qua trang đó, không chặn bản tin.
-extra_pages = { "reports/m2-metals-oil" = "../precious-metals/outputs/m2-metals-oil-20261115/report.html" }
+# Báo cáo nghiên cứu: tab "🔬 Nghiên cứu" nhúng từng trang (iframe), Pages phục vụ ở reports/<key>/.
+# src tương đối thư mục daily-brief; thiếu file → tab ghi "chưa có trang", không chặn bản tin. Xem brief/reports.py.
+# (Trang phụ không hiện trong tab vẫn khai báo được bằng extra_pages = { "đường/dẫn" = "file.html" }.)
+
+[[site.reports]]
+key = "m2-metals-oil"
+title = "Cung tiền M2, vàng, bạc, dầu & S&P 500"
+date = "2026-11-16"
+note = "Tương quan, cực trị, backtest vĩ mô walk-forward · giá đến 13/11/2026, M2 đến 09/2026"
+src = "../precious-metals/outputs/m2-metals-oil-20261115/report.html"
+
+[[site.reports]]
+key = "gsr-backtest"
+title = "Backtest tỷ lệ vàng/bạc (GSR)"
+date = "2026-11-11"
+note = "Đổi vàng ↔ bạc theo GSR, USD và VND"
+src = "../precious-metals/outputs/gsr-backtest-20261111/backtest_report.html"
+
+[[site.reports]]
+key = "silver-history"
+title = "Lịch sử vàng & bạc 1968–2026"
+date = "2026-11-11"
+note = "Đỉnh/đáy theo năm và chu kỳ, các nhịp giảm ≥20%"
+src = "../precious-metals/outputs/silver-history-20261111/page.html"
 
 [watchlist]
 # Tái sử dụng danh sách có sẵn trong repo stock (CHƯA được xác nhận là watchlist chính thức).
@@ -54,8 +75,15 @@ indices = ["VNINDEX", "VN30", "HNXINDEX"]
 cache_min = 10
 
 [ai]
-# Bot chỉ dùng AI khi bật và có lệnh `claude` (Claude Code CLI, đăng nhập bằng tài khoản của bạn).
-# Hiện tại: TẮT vì máy chưa cài Claude Code CLI trên PATH.
-enabled = false
-command = ["claude", "-p", "--model", "sonnet"]
+# Tóm tắt bản tin bằng Claude Code CLI `claude -p` (tính vào gói Claude của bạn). Xem docs/AI_TOM_TAT.md.
+# CLI: tự tìm trên PATH, ~/.local/bin, hoặc bản đi kèm app Claude Desktop. Đăng nhập: CLAUDE_CODE_OAUTH_TOKEN
+# (`claude setup-token`) trong daily-brief/.env. Chưa đăng nhập → bản tin template như cũ, không lỗi.
+enabled = true
+command = ["claude"]
+model = "sonnet"          # "haiku" rẻ hơn nữa nhưng tiếng Việt kém mượt hơn
+effort = "low"            # tóm tắt không cần suy luận dài → ít token "thinking"
 timeout_s = 300
+# Đoạn mở đầu bài báo (sapo + vài đoạn đầu) cho tin ĐÃ CHỌN, mỗi URL tải 1 lần (bảng articles), cắt ≤ article_chars.
+fetch_articles = true
+article_hosts = ["vnexpress.net", "cafef.vn"]
+article_chars = 900

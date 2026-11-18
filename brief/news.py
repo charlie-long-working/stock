@@ -25,6 +25,8 @@ SECTION_BY_SOURCE = {
     "vneconomy_chungkhoan": "stock", "vietstock_cophieu": "stock", "vietstock_nhandinh": "stock",
     "cafef_chungkhoan": "stock", "tnck_chungkhoan": "stock", "cafef_doanhnghiep": "stock",
     "cafef_taichinh": "vn_economy",
+    "vnexpress_noibat": "vn_politics", "vnexpress_batdongsan": "vn_economy",
+    "cafef_vimo": "vn_economy", "cafef_batdongsan": "vn_economy", "cafef_quocte": "world",
     "gnews_vietstock": "vn_economy", "vietstock_vang": "gold",
     "vnexpress_thegioi": "world", "vneconomy_kinhtethegioi": "world", "gnews_reuters": "world",
     "gnews_apnews": "world", "bbc_world": "world", "bbc_business": "world", "bbc_vietnamese": "world",

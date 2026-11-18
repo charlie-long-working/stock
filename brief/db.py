@@ -48,6 +48,10 @@ CREATE TABLE IF NOT EXISTS events(
   id INTEGER PRIMARY KEY, at TEXT NOT NULL, level TEXT NOT NULL,
   component TEXT NOT NULL, message TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS articles(
+  canonical_url TEXT PRIMARY KEY, url TEXT, fetched_at TEXT NOT NULL,
+  status TEXT NOT NULL, http INTEGER, text TEXT
+);
 CREATE TABLE IF NOT EXISTS kv(
   key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL
 );
@@ -108,5 +112,6 @@ def prune(path: Path = DB_PATH, item_days: int = 30, log_days: int = 30) -> None
     cut_log = iso(now_utc() - timedelta(days=log_days))
     with connect(path) as con:
         con.execute("DELETE FROM items WHERE fetched_at < ?", (cut_items,))
+        con.execute("DELETE FROM articles WHERE fetched_at < ?", (cut_items,))
         con.execute("DELETE FROM fetch_log WHERE started_at < ?", (cut_log,))
         con.execute("DELETE FROM events WHERE at < ?", (cut_log,))

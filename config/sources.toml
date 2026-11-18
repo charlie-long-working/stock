@@ -87,6 +87,47 @@ tier = "extended"
 format = "rss"
 url = "https://cafef.vn/doanh-nghiep.rss"
 
+# ---------- CafeF + VnExpress mở rộng (RSS công khai, kiểm tra 16/11/2026: HTTP 200, 26–60 item) ----------
+[[source]]
+id = "vnexpress_noibat"
+name = "VnExpress – Tin nổi bật"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vnexpress.net/rss/tin-noi-bat.rss"
+
+[[source]]
+id = "vnexpress_batdongsan"
+name = "VnExpress – Bất động sản"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://vnexpress.net/rss/bat-dong-san.rss"
+
+[[source]]
+id = "cafef_vimo"
+name = "CafeF – Vĩ mô, đầu tư"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://cafef.vn/vi-mo-dau-tu.rss"
+
+[[source]]
+id = "cafef_batdongsan"
+name = "CafeF – Bất động sản"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://cafef.vn/bat-dong-san.rss"
+
+[[source]]
+id = "cafef_quocte"
+name = "CafeF – Tài chính quốc tế"
+kind = "press"
+tier = "core"
+format = "rss"
+url = "https://cafef.vn/tai-chinh-quoc-te.rss"
+
 [[source]]
 id = "tnck_chungkhoan"
 name = "Tin nhanh chứng khoán – Chứng khoán"

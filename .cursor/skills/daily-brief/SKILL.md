@@ -24,7 +24,7 @@ Bot riêng `@nam_daily_brief_bot` — khác bot cảnh báo giao dịch. **Khôn
 3. Bot đang chạy dưới launchd → đổi code/config xong: `scripts/botctl.sh restart`. Không chạy `python -m brief bot` song song (409).
 4. Không vượt chặn bot của nguồn tin (UA trung thực trong `brief/http.py`). Nguồn 403 → tắt `enabled = false` và thay bằng Google News `site:` như `gnews_vietstock`.
 5. Không đổi tên import từ anh em: `vn_stock.data_loaders.vn_ohlcv`, `precious.universe`.
-6. Chạy test sau khi sửa: `../stock/.venv/bin/python -m unittest discover -s tests -t .` (32 test).
+6. Chạy test sau khi sửa: `../stock/.venv/bin/python -m unittest discover -s tests -t .` (~50 test, gồm `tests/test_ai_brief.py`).
 
 ## Cách hoạt động
 
@@ -32,7 +32,8 @@ Bot riêng `@nam_daily_brief_bot` — khác bot cảnh báo giao dịch. **Khôn
 - `brief/schedule.py` (trong process bot): 08:15 tin + vàng; 16:30 tin + chứng khoán (nếu có phiên) + vàng. Trễ > 20 phút ghi "gửi bù"; thử lại 3 lần cách 10 phút.
 - `brief/news.py`: RSS → SQLite `var/brief.db`, dedupe URL + trùng tiêu đề ≥ 0.5, chia mục theo nguồn/từ khoá. `compose.py`: tin từ lần gửi trước, bỏ URL đã gửi 48h.
 - `brief/market.py`: giá cổ phiếu (vn_stock + vnstock price board), vàng (GC=F, Vietcombank XML, VND=X), cache 10 phút.
-- `brief/ai.py`: tuỳ chọn `[ai] enabled` gọi `claude -p --model sonnet`; `validate()` buộc mọi ý có trích dẫn và mọi số có trong evidence; lỗi → quay về template (📋 template, 🤖 AI). Hiện **tắt**, và `claude` chưa có trên PATH của launchd.
+- `brief/ai.py`: `[ai] enabled = true` (16/11). `find_cli` tìm `claude` trên PATH → ~/.local/bin → bản đi kèm Claude Desktop (`~/Library/Application Support/Claude/claude-code/<ver>/…/claude`). Đăng nhập bằng `CLAUDE_CODE_OAUTH_TOKEN` (hoặc `ANTHROPIC_API_KEY`) trong `.env`; chưa có → template, không lỗi. Gọi gọn: `--system-prompt` (= `prompts/brief_vi.md`), `--tools ""`, không MCP/skill/settings, cwd `var/ai-cwd`, `--effort low`, JSON → usage ở `runs/*/bot-*/ai_usage.json` + kv `ai_last_usage`. `validate()` + `salvage()` (bỏ dòng lỗi, không gọi lại). Hướng dẫn: `docs/AI_TOM_TAT.md`.
+- `brief/article.py`: sapo + đoạn đầu bài CafeF/VnExpress cho tin đã chọn (≤ 900 ký tự), cache bảng `articles` (mỗi URL tải 1 lần).
 
 ## Map
 
@@ -91,7 +92,7 @@ python3 check_vps.py --baseline source_check_mac.json               # trên VPS
 - Thoát mã 2/3/4 (secret sai, webhook, 409) dưới launchd được đổi thành 0 để không lặp khởi động.
 - Lịch: trạng thái mỗi slot ở kv `sched:<ngày>:<slot>`; `/status` có mục "Lịch tự gửi hôm nay". Máy ngủ đúng giờ → gửi bù khi thức nếu chưa quá 15:00 (sáng) / 23:00 (chiều).
 - Nguồn: 19/23 RSS chạy; 4 RSS Vietstock 403 → `gnews_vietstock`. Chưa có giá SJC/vàng nhẫn tự động (sjc.com.vn Cloudflare 403, XML cũ 404). Chưa nối bot Telegram bên thứ ba (cần phiên client do user tự đăng nhập).
-- AI: chưa chạy thử `claude -p` (CLI chưa cài). Bản AI duy nhất là bản soạn tay trong phiên 14/11 (`runs/2026-11-14/manual-172106/`).
+- AI (16/11): code xong, CLI tìm thấy nhưng **chưa đăng nhập** → user cần `claude setup-token` rồi dán `CLAUDE_CODE_OAUTH_TOKEN` vào `.env` (docs/AI_TOM_TAT.md). Bản AI soạn tay 14/11 (`runs/2026-11-14/manual-172106/`) không hiện trên trang (site chỉ lấy `runs/*/bot-*`).
 - Báo cáo triển khai: `docs/BAO_CAO_2026-11-15.md`.
 
 Env: `BRIEF_TELEGRAM_BOT_TOKEN`, `BRIEF_TELEGRAM_CHAT_ID` (ưu tiên hơn `TELEGRAM_*`), đọc từ env → `.env` → `../Trading-bot/.env` → `../stock/.env` → `../precious-metals/.env`. `BRIEF_DB`, `BRIEF_SUPERVISED` (launchd đặt).
@@ -99,3 +100,7 @@ Env: `BRIEF_TELEGRAM_BOT_TOKEN`, `BRIEF_TELEGRAM_CHAT_ID` (ưu tiên hơn `TELEG
 ## Nguồn bổ sung 15/11/2026
 
 `cafef_chungkhoan`, `cafef_taichinh`, `cafef_doanhnghiep` (extended), `tnck_chungkhoan` — RSS công khai, đã `check-sources --write` (HTTP 200, 50 item) và map trong `SECTION_BY_SOURCE`.
+
+## Nguồn bổ sung 16/11/2026
+
+`vnexpress_noibat`, `vnexpress_batdongsan`, `cafef_vimo`, `cafef_batdongsan`, `cafef_quocte` (core). Tổng: 6 feed CafeF + 5 feed VnExpress. `cafef.vn/thi-truong.rss` (tin cũ) và `trang-chu.rss` (404) không dùng.
