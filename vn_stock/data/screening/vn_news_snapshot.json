@@ -1,125 +1,141 @@
 {
-  "generated_at": "2026-11-24T17:26:32.463683+07:00",
+  "generated_at": "2026-11-25T16:11:10.561937+07:00",
   "market": [
     {
-      "title": "Cổ phiếu cần quan tâm ngày 25/11",
-      "url": "https://www.tinnhanhchungkhoan.vn/co-phieu-can-quan-tam-ngay-2511-post401977.html",
-      "published": "2026-11-24T17:01:31+07:00",
+      "title": "Một cổ phiếu \"hot\" bị khối ngoại bán ròng đột biến 4.800 tỷ đồng phiên 25/11",
+      "url": "https://cafef.vn/mot-co-phieu-hot-bi-khoi-ngoai-ban-rong-dot-bien-4800-ty-dong-phien-25-11-188261125151859485.chn",
+      "published": "2026-11-25T15:45:00+07:00",
+      "source": "cafef",
+      "symbol": null
+    },
+    {
+      "title": "Lực bán gia tăng, VN-Index quay đầu giảm trong phiên 25/11",
+      "url": "https://www.tinnhanhchungkhoan.vn/luc-ban-gia-tang-vn-index-quay-dau-giam-trong-phien-2511-post402052.html",
+      "published": "2026-11-25T15:44:42+07:00",
       "source": "tnck",
       "symbol": null
     },
     {
-      "title": "Nhận định thị trường phiên giao dịch ngày 25/11: Nắm giữ cổ phiếu giữ được nền giá",
-      "url": "https://www.tinnhanhchungkhoan.vn/nhan-dinh-thi-truong-phien-giao-dich-ngay-2511-nam-giu-co-phieu-giu-duoc-nen-gia-post401997.html",
-      "published": "2026-11-24T16:38:20+07:00",
-      "source": "tnck",
-      "symbol": null
-    },
-    {
-      "title": "Góc nhìn kỹ thuật phiên giao dịch chứng khoán ngày 24/11: Kiểm định lại mốc 1.700 điểm",
-      "url": "https://www.tinnhanhchungkhoan.vn/goc-nhin-ky-thuat-phien-giao-dich-chung-khoan-ngay-2411-kiem-dinh-lai-moc-1700-diem-post401998.html",
-      "published": "2026-11-24T15:53:01+07:00",
-      "source": "tnck",
-      "symbol": null
-    },
-    {
-      "title": "VN-Index hồi phục nhẹ, nhưng chưa xác nhận đáy quanh 1650 điểm",
-      "url": "https://vneconomy.vn/vn-index-hoi-phuc-nhe-nhung-chua-xac-nhan-day-quanh-1650-diem.htm",
-      "published": "2026-11-24T00:37:01+00:00",
+      "title": "VN-Index thất bại trước mốc 1700 điểm, thanh khoản thấp kỷ lục",
+      "url": "https://vneconomy.vn/vn-index-that-bai-truoc-moc-1700-diem-thanh-khoan-thap-ky-luc.htm",
+      "published": "2026-11-25T05:01:07+00:00",
       "source": "vneconomy",
       "symbol": null
     },
     {
-      "title": "Khối ngoại tập trung bán cổ phiếu ngân hàng và chứng khoán trong phiên 23/11",
-      "url": "https://www.tinnhanhchungkhoan.vn/khoi-ngoai-tap-trung-ban-co-phieu-ngan-hang-va-chung-khoan-trong-phien-2311-post401976.html",
-      "published": "2026-11-23T17:50:34+07:00",
-      "source": "tnck",
+      "title": "Khối ngoại tiếp tục bán ròng, nhưng lại gom mạnh cổ phiếu POW",
+      "url": "https://vneconomy.vn/khoi-ngoai-tiep-tuc-ban-rong-nhung-lai-gom-manh-co-phieu-pow.htm",
+      "published": "2026-11-25T00:46:02+00:00",
+      "source": "vneconomy",
       "symbol": null
     }
   ],
   "symbols": {
-    "VCB": [],
+    "VCB": [
+      {
+        "title": "Một năm, hai thái cực của cổ phiếu Vietcombank: Tháng 1 lập đỉnh lịch sử, tháng 11 rơi xuống đáy gần 4 năm",
+        "url": "https://cafef.vn/mot-nam-hai-thai-cuc-cua-co-phieu-vietcombank-thang-1-lap-dinh-lich-su-thang-11-roi-xuong-day-gan-4-nam-18826112423534886.chn",
+        "published": "2026-11-25T00:00:00+07:00",
+        "source": "cafef",
+        "symbol": "VCB"
+      }
+    ],
     "BID": [],
     "TCB": [
       {
-        "title": "Ngày 24/11, gửi dưới 100 triệu đồng kỳ hạn 24 tháng tại Sacombank, MB, VPBank, Techcombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
-        "url": "https://cafef.vn/ngay-24-11-gui-duoi-100-trieu-dong-ky-han-24-thang-tai-sacombank-mb-vpbank-techcombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-188261123232641453.chn",
-        "published": "2026-11-24T10:24:00+07:00",
+        "title": "Ngày 25/11, gửi dưới 500 triệu đồng kỳ hạn 6 tháng tại MB, VPBank, Techcombank, Sacombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
+        "url": "https://cafef.vn/ngay-25-11-gui-duoi-500-trieu-dong-ky-han-6-thang-tai-mb-vpbank-techcombank-sacombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-18826112423263424.chn",
+        "published": "2026-11-25T01:00:00+07:00",
         "source": "cafef",
         "symbol": "TCB"
       }
     ],
     "CTG": [],
-    "MBB": [
-      {
-        "title": "MBB: Thông báo giao dịch cổ phiếu của tổ chức có liên quan đến người nội bộ Tập đoàn Công nghiệp - Viễn thông Quân đội",
-        "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNXzRXQlluSGtqQTNzd3ZFRE92TXpWOWQwaXZUV19JN1dBTHp3UzB4RmtxYTY0LUV1MTdOZWVKdTNhaHFKc182am1fN3BVSFNoeTRtbGNkdkw0M01MalFzTnZVRlYyU0N5ZXlZbjZlVUpCNDdjMGZMUktsZGRLNWI3aDZZeHVESDBPZEd0QUVzQXZNSXNVd1VodS1uY29KYUg1UkR4LW1JWjlrZkdYT1lCUXhwNFQxS3ItQ21yUUdXTGR2cFpUbkFXbnFBRl9jT0hqeldxTXIxWmlSWjFpVzk5NTJNZ2o0SktCNVREYk5FaC1pdw?oc=5",
-        "published": "2026-11-23T10:29:48+00:00",
-        "source": "gnews",
-        "symbol": "MBB"
-      }
-    ],
+    "MBB": [],
     "FPT": [
       {
-        "title": "Sáu \"gia tộc\" trên sàn sau gần 11 tháng: Vingroup thêm gần 500.000 tỷ đồng, họ Hòa Phát vượt họ FPT",
-        "url": "https://cafef.vn/sau-gia-toc-tren-san-sau-gan-11-thang-vingroup-them-gan-500000-ty-dong-ho-hoa-phat-vuot-ho-fpt-188261123235903489.chn",
-        "published": "2026-11-24T07:52:00+07:00",
+        "title": "FPT Software dự kiến doanh thu lập kỷ lục trong quý 4",
+        "url": "https://cafef.vn/fpt-software-du-kien-doanh-thu-lap-ky-luc-trong-quy-4-188261124205750774.chn",
+        "published": "2026-11-25T00:12:00+07:00",
         "source": "cafef",
         "symbol": "FPT"
       }
     ],
-    "HPG": [
+    "HPG": [],
+    "MWG": [],
+    "MSN": [
       {
-        "title": "Liên danh Đại Quang Minh - THACO - Hòa Phát được giao lấy ý kiến về 2 trục đại lộ ven sông Hồng dài gần 80km",
-        "url": "https://cafef.vn/lien-danh-dai-quang-minh-thaco-hoa-phat-duoc-giao-lay-y-kien-ve-2-truc-dai-lo-ven-song-hong-dai-gan-80km-188261124122108666.chn",
-        "published": "2026-11-24T12:21:00+07:00",
+        "title": "Nhà cung cấp nguyên liệu cho Trung Nguyên, Vinamilk, Masan phát thông báo quan trọng",
+        "url": "https://cafef.vn/nha-cung-cap-nguyen-lieu-cho-trung-nguyen-vinamilk-masan-phat-thong-bao-quan-trong-188261124222840641.chn",
+        "published": "2026-11-25T02:00:00+07:00",
         "source": "cafef",
-        "symbol": "HPG"
-      },
-      {
-        "title": "Sáu \"gia tộc\" trên sàn sau gần 11 tháng: Vingroup thêm gần 500.000 tỷ đồng, họ Hòa Phát vượt họ FPT",
-        "url": "https://cafef.vn/sau-gia-toc-tren-san-sau-gan-11-thang-vingroup-them-gan-500000-ty-dong-ho-hoa-phat-vuot-ho-fpt-188261123235903489.chn",
-        "published": "2026-11-24T07:52:00+07:00",
-        "source": "cafef",
-        "symbol": "HPG"
+        "symbol": "MSN"
       }
     ],
-    "MWG": [],
-    "MSN": [],
     "GAS": [
       {
-        "title": "GAS: Thông báo thay đổi nhân sự - Bổ nhiệm Phó Tổng Giám đốc (kèm Quyết định)",
-        "url": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOY0c1MVI4cXpLVS1qM1ZlWm5YQ3diLVJjc0o0aU1yb3RaY3ZYSnYzQVJFbDd3OWV4TFZxaENrSWpwR1hSay1wVnpYUmFmb2N4TGw2QkpEbEVON1VBcmY1eERCWWg5TlZ6dENRUVZ1RGxCZ1VBZG5BU2VmeWtoZHVCS1ZwN21jYjlDZWx4bWswTG1vZFdla1JRTUVhd3RxUW5wQURrY2dOUUdCeDB6U3hDNVBCbGlwRlV6?oc=5",
-        "published": "2026-11-23T08:46:02+00:00",
-        "source": "gnews",
+        "title": "PV GAS bổ nhiệm nữ Phó Tổng giám đốc",
+        "url": "https://cafef.vn/pv-gas-bo-nhiem-nu-pho-tong-giam-doc-188261125135236246.chn",
+        "published": "2026-11-25T13:52:00+07:00",
+        "source": "cafef",
+        "symbol": "GAS"
+      },
+      {
+        "title": "Công ty của tỷ phú Phạm Nhật Vượng đánh bật PV GAS khỏi top 10 lớn nhất thị trường, Vinamilk đứng trước nguy cơ rời top 20",
+        "url": "https://cafef.vn/cong-ty-cua-ty-phu-pham-nhat-vuong-danh-bat-pv-gas-khoi-top-10-lon-nhat-thi-truong-vinamilk-dung-truoc-nguy-co-roi-top-20-188261124092013834.chn",
+        "published": "2026-11-25T00:02:00+07:00",
+        "source": "cafef",
         "symbol": "GAS"
       }
     ],
-    "VHM": [],
+    "VHM": [
+      {
+        "title": "Tỷ phú Phạm Nhật Vượng đang đàm phán tìm quỹ đất tại Ấn Độ sau đề xuất 2 đại đô thị 9,5 tỷ USD, rộng gấp 4 lần Vinhomes Smart City Hà Nội",
+        "url": "https://cafef.vn/ty-phu-pham-nhat-vuong-dang-dam-phan-tim-quy-dat-tai-an-do-sau-de-xuat-2-dai-do-thi-95-ty-usd-rong-gap-4-lan-vinhomes-smart-city-ha-noi-188261125111105335.chn",
+        "published": "2026-11-25T11:14:00+07:00",
+        "source": "cafef",
+        "symbol": "VHM"
+      }
+    ],
     "VNM": [
       {
-        "title": "ĐHĐCĐ bất thường của JC&C: Thông qua chia ‘cổ tức đặc biệt’, hé lộ kế hoạch thoái vốn VNM",
-        "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQVE9URk41NG9rNF9maUw2bWdkRG4yWTV1TDY1TzNYWUZydHMzWUpXYnZGeEVWcEh5dTF4aDB2emhSYldGU29kU095Z3ZMZ2JORGtKR1NSNjlsMXlMWEN3ZF9MazNVN2FwbnNYV3N2TzhEdGs3YWxfbUxZQTczSFU3bVBMX3oxdVV0NEk1NjhBdzNxQmphTW5XVk1kdUYxSmdHbTdyQlNjQ1paQi1Kb2tKTGZZdXVTcktDWm1ZNHhWeE01VlJobXBubW9kM2ZsX2pTNGJn?oc=5",
-        "published": "2026-11-24T02:32:00+00:00",
-        "source": "gnews",
+        "title": "Nhà cung cấp nguyên liệu cho Trung Nguyên, Vinamilk, Masan phát thông báo quan trọng",
+        "url": "https://cafef.vn/nha-cung-cap-nguyen-lieu-cho-trung-nguyen-vinamilk-masan-phat-thong-bao-quan-trong-188261124222840641.chn",
+        "published": "2026-11-25T02:00:00+07:00",
+        "source": "cafef",
+        "symbol": "VNM"
+      },
+      {
+        "title": "Công ty của tỷ phú Phạm Nhật Vượng đánh bật PV GAS khỏi top 10 lớn nhất thị trường, Vinamilk đứng trước nguy cơ rời top 20",
+        "url": "https://cafef.vn/cong-ty-cua-ty-phu-pham-nhat-vuong-danh-bat-pv-gas-khoi-top-10-lon-nhat-thi-truong-vinamilk-dung-truoc-nguy-co-roi-top-20-188261124092013834.chn",
+        "published": "2026-11-25T00:02:00+07:00",
+        "source": "cafef",
         "symbol": "VNM"
       }
     ],
-    "SSI": [],
+    "SSI": [
+      {
+        "title": "Chuyên gia SSI: Vốn nâng hạng FTSE mới ở mức thăm dò 230 triệu USD, chờ 4 biến số lớn năm 2027",
+        "url": "https://www.tinnhanhchungkhoan.vn/chuyen-gia-ssi-von-nang-hang-ftse-moi-o-muc-tham-do-230-trieu-usd-cho-4-bien-so-lon-nam-2027-post402033.html",
+        "published": "2026-11-25T14:56:00+07:00",
+        "source": "tnck",
+        "symbol": "SSI"
+      }
+    ],
     "ACB": [
       {
-        "title": "Ngày 24/11, gửi dưới 100 triệu đồng kỳ hạn 24 tháng tại Sacombank, MB, VPBank, Techcombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
-        "url": "https://cafef.vn/ngay-24-11-gui-duoi-100-trieu-dong-ky-han-24-thang-tai-sacombank-mb-vpbank-techcombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-188261123232641453.chn",
-        "published": "2026-11-24T10:24:00+07:00",
+        "title": "Ngày 25/11, gửi dưới 500 triệu đồng kỳ hạn 6 tháng tại MB, VPBank, Techcombank, Sacombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
+        "url": "https://cafef.vn/ngay-25-11-gui-duoi-500-trieu-dong-ky-han-6-thang-tai-mb-vpbank-techcombank-sacombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-18826112423263424.chn",
+        "published": "2026-11-25T01:00:00+07:00",
         "source": "cafef",
         "symbol": "ACB"
       }
     ],
     "VPB": [
       {
-        "title": "Ngày 24/11, gửi dưới 100 triệu đồng kỳ hạn 24 tháng tại Sacombank, MB, VPBank, Techcombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
-        "url": "https://cafef.vn/ngay-24-11-gui-duoi-100-trieu-dong-ky-han-24-thang-tai-sacombank-mb-vpbank-techcombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-188261123232641453.chn",
-        "published": "2026-11-24T10:24:00+07:00",
+        "title": "Ngày 25/11, gửi dưới 500 triệu đồng kỳ hạn 6 tháng tại MB, VPBank, Techcombank, Sacombank, SHB, HDBank và ACB nhận được bao nhiêu tiền lãi?",
+        "url": "https://cafef.vn/ngay-25-11-gui-duoi-500-trieu-dong-ky-han-6-thang-tai-mb-vpbank-techcombank-sacombank-shb-hdbank-va-acb-nhan-duoc-bao-nhieu-tien-lai-18826112423263424.chn",
+        "published": "2026-11-25T01:00:00+07:00",
         "source": "cafef",
         "symbol": "VPB"
       }
