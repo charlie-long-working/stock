@@ -1,0 +1,51 @@
+# Được brief/publish.py chép vào nhánh gh-pages của repo stock. Sửa ở daily-brief, đừng sửa trên nhánh gh-pages.
+# Mỗi lần bot daily-brief dựng lại trang (08:25, 16:45) nó đẩy một commit mới lên gh-pages → workflow này deploy Pages.
+name: Deploy bảng tin (GitHub Pages)
+
+on:
+  push:
+    branches: [gh-pages]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Kiểm tra trang
+        run: |
+          set -e
+          test -f index.html
+          size=$(stat -c %s index.html)
+          echo "index.html: $((size / 1024)) KB"
+          test "$size" -gt 100000 || { echo "::error::index.html quá nhỏ ($size B)"; exit 1; }
+          grep -q '<script id="data" type="application/json">' index.html || { echo "::error::thiếu khối dữ liệu nhúng"; exit 1; }
+          if grep -q '/\*__DATA__\*/' index.html; then echo "::error::dữ liệu chưa được nhúng"; exit 1; fi
+          cat publish.json 2>/dev/null || true
+          mkdir -p _site
+          cp index.html _site/
+          # Trang phụ ([site] extra_pages trong daily-brief): mọi thư mục cấp 1 (không gồm .github) chép nguyên
+          for d in */; do
+            if [ -d "$d" ] && [ "$d" != "_site/" ]; then cp -R "${d%/}" _site/; echo "trang phụ: ${d%/}"; fi
+          done
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

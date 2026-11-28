@@ -1,0 +1,12 @@
+{
+ "published_at": "2026-11-28T10:36:29+00:00",
+ "kb": 2457,
+ "sha256": "fc528bc124746af36186baae35ec87bcd3d9e88ae7789b0f9483861e3b4a420c",
+ "extra_pages": [
+  "reports/gsr-backtest",
+  "reports/m2-metals-oil",
+  "reports/silver-history"
+ ],
+ "generated_at": "28/11 16:46",
+ "errors": {}
+}
